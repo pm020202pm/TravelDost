@@ -87,7 +87,7 @@ class _UserCardState extends State<UserCard> {
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: const EdgeInsets.all(12),
+      padding: const EdgeInsets.all(8),
       child: Card(
           color: widget.color,
           child: Padding(
@@ -125,7 +125,9 @@ class _UserCardState extends State<UserCard> {
                       ),
                       child: TextButton(
                           onPressed: (){
-                            newUser(widget.time, widget.name);
+                            if(widget.isMatched ==false){
+                              newUser(widget.time, widget.name);
+                            }
                           },
                           child: widget.isMatched ? const Text("Accepted") : const Text("Accept")),
                     )
