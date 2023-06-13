@@ -1,6 +1,6 @@
 # TravelDost
 
-A new Flutter project.
+Find your travel mates!
 
 ## Getting Started
 
