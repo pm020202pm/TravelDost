@@ -86,6 +86,7 @@ class _UserCardState extends State<UserCard> {
 
   @override
   Widget build(BuildContext context) {
+    Size screenSize = MediaQuery.of(context).size;
     return Padding(
       padding: const EdgeInsets.all(8),
       child: Card(
@@ -109,7 +110,7 @@ class _UserCardState extends State<UserCard> {
                 Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text('Name: ${widget.name}'),
+                    Container(child: Text('Name: ${widget.name}'), width: 0.6*screenSize.width,),
                     const SizedBox(
                       height: 10,
                     ),
