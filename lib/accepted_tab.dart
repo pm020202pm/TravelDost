@@ -1,21 +1,16 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
-import 'package:transport/user.dart';
 import 'package:transport/user_card.dart';
-import 'fetch_firestore_data.dart';
 
 class AcceptedTab extends StatefulWidget {
-  final List<User> users;
-  AcceptedTab({required this.users});
+  const AcceptedTab({super.key});
   @override
   _AcceptedTabState createState() => _AcceptedTabState();
 }
 
 class _AcceptedTabState extends State<AcceptedTab> {
-  // List<User> acceptedUsers = [];
-
   Future<List<QueryDocumentSnapshot>> fetchFirestoreDocuments() async {
-    QuerySnapshot querySnapshot = await firestore.collection('Accepted').get();
+    QuerySnapshot querySnapshot = await FirebaseFirestore.instance.collection('Accepted').get();
     List<QueryDocumentSnapshot> documents = querySnapshot.docs;
     return documents;
   }
@@ -28,7 +23,7 @@ class _AcceptedTabState extends State<AcceptedTab> {
 
   Future<void> _refreshAcceptedUsers() async {
     await Future.delayed(
-        const Duration(seconds: 1)); // Simulating a delay for refreshing data
+        const Duration(seconds: 1));
     acceptUsers();
   }
 
@@ -61,6 +56,7 @@ class _AcceptedTabState extends State<AcceptedTab> {
       }
     }
   }
+
   @override
   Widget build(BuildContext context) {
     return RefreshIndicator(
@@ -69,7 +65,7 @@ class _AcceptedTabState extends State<AcceptedTab> {
         future: fetchFirestoreDocuments(),
         builder: (BuildContext context,
             AsyncSnapshot<List<QueryDocumentSnapshot>> snapshot) {
-          if (snapshot.connectionState == ConnectionState.waiting) { return CircularProgressIndicator(); }
+          if (snapshot.connectionState == ConnectionState.waiting) { return const Text("Loading..."); }
           if (snapshot.hasError) {return Text('Error: ${snapshot.error}');}
           List<QueryDocumentSnapshot> documents = snapshot.data!;
 

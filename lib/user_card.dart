@@ -1,11 +1,10 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
-import 'package:transport/accepted_tab.dart';
+
+import 'constants.dart';
 
 class UserCard extends StatefulWidget {
-  UserCard(
-      {Key? key, required this.name, required this.time, required this.color, required this.isMatched})
-      : super(key: key);
+  UserCard({Key? key, required this.name, required this.time, required this.color, required this.isMatched}) : super(key: key);
 
   final String name;
   final int time;
@@ -17,21 +16,19 @@ class UserCard extends StatefulWidget {
 
 class _UserCardState extends State<UserCard> {
   final TextEditingController _nameController = TextEditingController();
-  final TextEditingController _timeController = TextEditingController();
 
-
-  Future<bool> duplicates() async {
-    String itemName = _nameController.text;
-    QuerySnapshot querySnapshot = await FirebaseFirestore.instance
-        .collection('Users')
-        .where("Name", isEqualTo: itemName)
-        .get();
-    if (querySnapshot.docs.isNotEmpty) {
-      return true;
-    } else {
-      return false;
-    }
-  }
+  // Future<bool> duplicates() async {
+  //   String itemName = _nameController.text;
+  //   QuerySnapshot querySnapshot = await FirebaseFirestore.instance
+  //       .collection('Users')
+  //       .where("Name", isEqualTo: itemName)
+  //       .get();
+  //   if (querySnapshot.docs.isNotEmpty) {
+  //     return true;
+  //   } else {
+  //     return false;
+  //   }
+  // }
 
   void newUser(int time, String name) {
     showDialog(
@@ -61,7 +58,7 @@ class _UserCardState extends State<UserCard> {
               onPressed: () async {
                 if (await duplicates() == false) {
                   await FirebaseFirestore.instance.collection('Accepted').add({
-                        'Name': "${_nameController.text} accepted ${name} request!",
+                        'Name': "${_nameController.text} accepted $name request!",
                         'Time': time,
                         'isMatched': true,
                       }).then((value) => print("User added")).catchError((error) => print("Failed to add user: $error"));
@@ -104,34 +101,33 @@ class _UserCardState extends State<UserCard> {
                   height: 80,
                   child: Image.asset('assets/avatar.png'),
                 ),
-                const SizedBox(
-                  width: 20,
-                ),
+                const SizedBox(width: 20,),
                 Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Container(child: Text('Name: ${widget.name}'), width: 0.6*screenSize.width,),
-                    const SizedBox(
-                      height: 10,
-                    ),
+                    SizedBox(width: 0.6*screenSize.width,child: Text('Name: ${widget.name}'),),
+                    const SizedBox(height: 10,),
                     Text('Timing: ${widget.time}'),
-                    const SizedBox(
-                      height: 10,
+                    const SizedBox(height: 10,),
+                    Row(
+                      children: [
+                        Container(
+                          height: 30,
+                          decoration: BoxDecoration(
+                            borderRadius: BorderRadius.circular(10),
+                            color: widget.isMatched ? Colors.green[100] : Colors.blue[100],
+                          ),
+                          child: TextButton(
+                              onPressed: (){
+                                if(widget.isMatched ==false){
+                                  newUser(widget.time, widget.name);
+                                }
+                              },
+                              child: widget.isMatched ? const Text("Accepted") : const Text("Accept")),
+                        ),
+                      ],
                     ),
-                    Container(
-                      height: 30,
-                      decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(10),
-                        color: widget.isMatched ? Colors.green[100] : Colors.blue[100],
-                      ),
-                      child: TextButton(
-                          onPressed: (){
-                            if(widget.isMatched ==false){
-                              newUser(widget.time, widget.name);
-                            }
-                          },
-                          child: widget.isMatched ? const Text("Accepted") : const Text("Accept")),
-                    )
+
                   ],
                 ),
               ],
