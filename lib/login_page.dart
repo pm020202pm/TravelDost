@@ -13,6 +13,7 @@ class _LoginPageState extends State<LoginPage> {
   final TextEditingController emailController = TextEditingController();
   final TextEditingController passwordController = TextEditingController();
 
+  /////REGISTER WITH EMAIL AND PASSWORD
   void registerWithEmailAndPassword(String email, String password) async {
     try {
       UserCredential userCredential = await FirebaseAuth.instance.createUserWithEmailAndPassword(
@@ -25,6 +26,7 @@ class _LoginPageState extends State<LoginPage> {
     }
   }
 
+  /////SIGN IN WITH EMAIL AND PASSWORD
   void signInWithEmailAndPassword(String email, String password) async {
     try {
       UserCredential userCredential = await FirebaseAuth.instance.signInWithEmailAndPassword(
@@ -41,9 +43,8 @@ class _LoginPageState extends State<LoginPage> {
             myList=true;
           });
         }
-        print('YOUR LIST BOOL : $myList');
+        print('MY LIST BOOL : $myList');
         Navigator.push(context, MaterialPageRoute(builder: (context)=> MyHomePage()));
-
       }
     }
     catch (e) {
@@ -59,21 +60,15 @@ class _LoginPageState extends State<LoginPage> {
         child: Center(
           child: Column(
               children: [
-                TextField(
-                  controller: emailController,
-                ),
+                TextField(controller: emailController,),
                 const SizedBox(height: 30,),
-                TextField(
-                  controller: passwordController,
-                ),
+                TextField(controller: passwordController,),
                 TextButton(
                     onPressed: (){registerWithEmailAndPassword(emailController.text, passwordController.text);},
                     child: const Text('Register')
                 ),
                 TextButton(
-                    onPressed: (){
-                      signInWithEmailAndPassword(emailController.text, passwordController.text);
-                      },
+                    onPressed: (){signInWithEmailAndPassword(emailController.text, passwordController.text);},
                     child: const Text('Login')
                 ),
               ],

@@ -2,11 +2,10 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 
 late String userUid;
 bool myList=false;
+
+/////CHECK FOR MULTIPLE REQUEST FROM SINGLE USER
 Future<bool> duplicates() async {
-  QuerySnapshot querySnapshot = await FirebaseFirestore.instance
-      .collection('Users')
-      .where("Uid", isEqualTo: userUid)
-      .get();
+  QuerySnapshot querySnapshot = await FirebaseFirestore.instance.collection('Users').where("Uid", isEqualTo: userUid).get();
   if (querySnapshot.docs.isNotEmpty) {
     return true;
   }
@@ -15,20 +14,20 @@ Future<bool> duplicates() async {
   }
 }
 
+////RETRIEVING DATA OF DOCUMENT EXCEPT USER's DOCUMENT
 Future<List<QueryDocumentSnapshot>> fetchFirestoreDocuments() async {
-  QuerySnapshot querySnapshot = await FirebaseFirestore.instance.collection('Users').get();
-  // Access the documents in the query snapshot
+  final querySnapshot = await FirebaseFirestore.instance.collection('Users').where('Uid', isNotEqualTo: userUid).get();
   List<QueryDocumentSnapshot> documents = querySnapshot.docs;
   return documents;
 }
 
+
 void deleteContact(String documentId) {
-  FirebaseFirestore.instance.collection('Users').doc(documentId).delete()
-      .then((value) {
+  FirebaseFirestore.instance.collection('Users').doc(documentId).delete().then((value) {
     print('Contact deleted successfully.');
-  })
-      .catchError((error) {
+  }).catchError((error) {
     print('Failed to delete contact: $error');
   });
 }
+
 

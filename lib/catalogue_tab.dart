@@ -23,11 +23,9 @@ class _CatalogueTabState extends State<CatalogueTab> {
             children: [
               const Padding(
                 padding: EdgeInsets.fromLTRB(10, 5, 0, 0),
-                child: Text('My Request', style: TextStyle(), textAlign: TextAlign.left,),
+                child: Text('My Request'),
               ),
-              Container(
-                child: MyCard(),
-              ),
+              MyCard(),
             ],
           ),
           const SizedBox(height: 20,),
@@ -43,14 +41,14 @@ class _CatalogueTabState extends State<CatalogueTab> {
                 if (snapshot.connectionState == ConnectionState.waiting) { return const Text('Loading...'); }
                 if (snapshot.hasError) {return Text('Error: ${snapshot.error}');}
                 List<QueryDocumentSnapshot> documents = snapshot.data!;
-
                 return ListView.builder(
                   itemCount: documents.length,
                   itemBuilder: (BuildContext context, int index) {
                     var name = documents[index].get('Name');
                     var time = documents[index].get('Time');
                     var isMatched = documents[index].get('isMatched');
-                    return UserCard(color: isMatched? Colors.green : null, name: name, time: time, isMatched: false);
+                    var imageUrl = documents[index].get('imageUrl');
+                    return UserCard(color: isMatched? Colors.green : null, name: name, time: time, isMatched: false, imageUrl: imageUrl,);
                   },
                 );
               },

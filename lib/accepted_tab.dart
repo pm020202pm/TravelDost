@@ -21,11 +21,6 @@ class _AcceptedTabState extends State<AcceptedTab> {
     acceptUsers();
   }
 
-  Future<void> _refreshAcceptedUsers() async {
-    await Future.delayed(
-        const Duration(seconds: 1));
-    acceptUsers();
-  }
 
   Future<void> acceptUsers () async {
     QuerySnapshot querySnapshot = await FirebaseFirestore.instance.collection('Users').get();
@@ -59,26 +54,22 @@ class _AcceptedTabState extends State<AcceptedTab> {
 
   @override
   Widget build(BuildContext context) {
-    return RefreshIndicator(
-      onRefresh: _refreshAcceptedUsers,
-      child: FutureBuilder<List<QueryDocumentSnapshot>>(
-        future: fetchFirestoreDocuments(),
-        builder: (BuildContext context,
-            AsyncSnapshot<List<QueryDocumentSnapshot>> snapshot) {
-          if (snapshot.connectionState == ConnectionState.waiting) { return const Text("Loading..."); }
-          if (snapshot.hasError) {return Text('Error: ${snapshot.error}');}
-          List<QueryDocumentSnapshot> documents = snapshot.data!;
-
-          return ListView.builder(
-            itemCount: documents.length,
-            itemBuilder: (BuildContext context, int index) {
-              var name = documents[index].get('Name');
-              var time = documents[index].get('Time');
-              return UserCard(color: Colors.green, name: name, time: time, isMatched: true);
-            },
-          );
-        },
-      )
+    return FutureBuilder<List<QueryDocumentSnapshot>>(
+      future: fetchFirestoreDocuments(),
+      builder: (BuildContext context,
+          AsyncSnapshot<List<QueryDocumentSnapshot>> snapshot) {
+        if (snapshot.connectionState == ConnectionState.waiting) { return const Text("Loading..."); }
+        if (snapshot.hasError) {return Text('Error: ${snapshot.error}');}
+        List<QueryDocumentSnapshot> documents = snapshot.data!;
+        return ListView.builder(
+          itemCount: documents.length,
+          itemBuilder: (BuildContext context, int index) {
+            var name = documents[index].get('Name');
+            var time = documents[index].get('Time');
+            return UserCard(color: Colors.green, name: name, time: time, isMatched: true, imageUrl: 'assets/avatar.png',);
+          },
+        );
+      },
     );
   }
 }

@@ -14,7 +14,7 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       routes:{
-        '/homepage' : (context) => MyHomePage(),
+        '/homepage' : (context) => const MyHomePage(),
       },
       title: 'TravelDost',
       theme: ThemeData(

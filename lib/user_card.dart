@@ -1,34 +1,21 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
-
 import 'constants.dart';
 
 class UserCard extends StatefulWidget {
-  UserCard({Key? key, required this.name, required this.time, required this.color, required this.isMatched}) : super(key: key);
+  UserCard({Key? key, required this.name, required this.time, required this.color, required this.isMatched, required this.imageUrl}) : super(key: key);
 
   final String name;
   final int time;
   final MaterialColor? color;
   final bool isMatched;
+  final String imageUrl;
   @override
   State<UserCard> createState() => _UserCardState();
 }
 
 class _UserCardState extends State<UserCard> {
   final TextEditingController _nameController = TextEditingController();
-
-  // Future<bool> duplicates() async {
-  //   String itemName = _nameController.text;
-  //   QuerySnapshot querySnapshot = await FirebaseFirestore.instance
-  //       .collection('Users')
-  //       .where("Name", isEqualTo: itemName)
-  //       .get();
-  //   if (querySnapshot.docs.isNotEmpty) {
-  //     return true;
-  //   } else {
-  //     return false;
-  //   }
-  // }
 
   void newUser(int time, String name) {
     showDialog(
@@ -80,7 +67,6 @@ class _UserCardState extends State<UserCard> {
     );
   }
 
-
   @override
   Widget build(BuildContext context) {
     Size screenSize = MediaQuery.of(context).size;
@@ -99,7 +85,7 @@ class _UserCardState extends State<UserCard> {
                     borderRadius: BorderRadius.circular(5),
                   ),
                   height: 80,
-                  child: Image.asset('assets/avatar.png'),
+                  child: Image.network(widget.imageUrl),
                 ),
                 const SizedBox(width: 20,),
                 Column(
