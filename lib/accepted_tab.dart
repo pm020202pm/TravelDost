@@ -66,7 +66,7 @@ class _AcceptedTabState extends State<AcceptedTab> {
           itemBuilder: (BuildContext context, int index) {
             var name = documents[index].get('Name');
             var time = documents[index].get('Time');
-            return UserCard(color: Colors.green, name: name, time: time, isMatched: true, imageUrl: 'assets/avatar.png',);
+            return UserCard(color: Colors.green, name: name, time: time, isMatched: true, imageUrl: 'assets/avatar.png',uid: '',);
           },
         );
       },

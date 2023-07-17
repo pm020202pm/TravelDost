@@ -48,7 +48,8 @@ class _CatalogueTabState extends State<CatalogueTab> {
                     var time = documents[index].get('Time');
                     var isMatched = documents[index].get('isMatched');
                     var imageUrl = documents[index].get('imageUrl');
-                    return UserCard(color: isMatched? Colors.green : null, name: name, time: time, isMatched: false, imageUrl: imageUrl,);
+                    var uid = documents[index].get('Uid');
+                    return UserCard(color: isMatched? Colors.green : null, name: name, time: time, isMatched: false, imageUrl: imageUrl, uid: uid,);
                   },
                 );
               },

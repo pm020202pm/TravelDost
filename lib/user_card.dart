@@ -1,15 +1,19 @@
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'constants.dart';
 
+
 class UserCard extends StatefulWidget {
-  UserCard({Key? key, required this.name, required this.time, required this.color, required this.isMatched, required this.imageUrl}) : super(key: key);
+  UserCard({Key? key, required this.name, required this.time, required this.color, required this.isMatched, required this.imageUrl, required this.uid}) : super(key: key);
 
   final String name;
   final int time;
   final MaterialColor? color;
   final bool isMatched;
   final String imageUrl;
+  final String uid;
+  late final String otherFCM;
   @override
   State<UserCard> createState() => _UserCardState();
 }
@@ -17,7 +21,43 @@ class UserCard extends StatefulWidget {
 class _UserCardState extends State<UserCard> {
   final TextEditingController _nameController = TextEditingController();
 
-  void newUser(int time, String name) {
+  Future<void> getFCMByUid() async {
+    QuerySnapshot snapshot = await FirebaseFirestore.instance.collection('fcm').where('uid', isEqualTo: widget.uid).get();
+    if (snapshot.size > 0) {
+      DocumentSnapshot doc = await FirebaseFirestore.instance.collection('fcm').doc(snapshot.docs[0].id).get();
+      if (doc.exists) {
+        setState(() {
+          widget.otherFCM = doc.get('token');
+        });
+      }
+      else {
+        print('Document with ID does not exist.');
+      }
+    }
+    else {
+      print('no_doc');
+    }
+  }
+
+  Future<void> accept(int time, String name) async {
+    if (await duplicates() == false) {
+    await FirebaseFirestore.instance.collection('Accepted').add({
+    'Name': "${_nameController.text} accepted $name request!",
+    'Time': time,
+    'isMatched': true,
+    }).then((value) => print("User added")).catchError((error) => print("Failed to add user: $error"));
+    final querySnapshot = await FirebaseFirestore.instance.collection('Users').where('Time', isEqualTo: time).get();
+    final batch = FirebaseFirestore.instance.batch();
+    querySnapshot.docs.forEach((doc) {
+    batch.delete(doc.reference);
+    });
+    await batch.commit();
+    }
+    Navigator.pop(context);
+    _nameController.clear();
+  }
+
+  void acceptDialog() {
     showDialog(
       context: context,
       builder: (BuildContext context) {
@@ -36,30 +76,11 @@ class _UserCardState extends State<UserCard> {
           actions: [
             TextButton(
               child: const Text('Cancel'),
-              onPressed: () {
-                Navigator.pop(context);
-              },
+              onPressed: () {Navigator.pop(context);},
             ),
             TextButton(
               child: const Text('Submit'),
-              onPressed: () async {
-                if (await duplicates() == false) {
-                  await FirebaseFirestore.instance.collection('Accepted').add({
-                        'Name': "${_nameController.text} accepted $name request!",
-                        'Time': time,
-                        'isMatched': true,
-                      }).then((value) => print("User added")).catchError((error) => print("Failed to add user: $error"));
-                  final querySnapshot = await FirebaseFirestore.instance.collection('Users').where('Time', isEqualTo: time).get();
-                  final batch = FirebaseFirestore.instance.batch();
-                  querySnapshot.docs.forEach((doc) {
-                    batch.delete(doc.reference);
-                  });
-                  await batch.commit();
-                }
-                Navigator.pop(context);
-                _nameController.clear();
-
-              },
+              onPressed: () {accept(widget.time, widget.name);},
             ),
           ],
         );
@@ -104,12 +125,13 @@ class _UserCardState extends State<UserCard> {
                             color: widget.isMatched ? Colors.green[100] : Colors.blue[100],
                           ),
                           child: TextButton(
-                              onPressed: (){
-                                if(widget.isMatched ==false){
-                                  newUser(widget.time, widget.name);
-                                }
-                              },
-                              child: widget.isMatched ? const Text("Accepted") : const Text("Accept")),
+                              onPressed: () async {
+                                await getFCMByUid();
+                                sendPushNotificationToUser(widget.otherFCM);
+                                // if(widget.isMatched ==false){acceptDialog();}
+                                },
+                              child: const Text("Accept"),)
+                              // widget.isMatched ? const Text("Accepted") : const Text("Accept")),
                         ),
                       ],
                     ),

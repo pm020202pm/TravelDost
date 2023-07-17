@@ -38,6 +38,7 @@ class _LoginPageState extends State<LoginPage> {
         setState(() {
           userUid=user.uid;
         });
+        mapAndSendFCM();
         if(await duplicates()){
           setState(() {
             myList=true;
