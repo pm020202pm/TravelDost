@@ -3,6 +3,74 @@ late String userUid;
 late String userName;
 late String userImageUrl;
 bool myList=false;
+bool isMyCardExpanded = false;
+final List<String> hours = [
+  '1',
+  '2',
+  '3',
+  '4',
+  '5',
+  '6',
+  '7',
+  '8',
+  '9',
+  '10',
+  '11',
+  '12'
+];
+final List<String> minutes = [
+  '00',
+  '05',
+  '10',
+  '15',
+  '20',
+  '25',
+  '30',
+  '35',
+  '40',
+  '45',
+  '50',
+  '55',
+];
+final List<String> pmam = [
+  'AM',
+  'PM',
+];
+int selectedHour=0;
+int selectedMinute=0;
+int selectedPmAm=0;
+
+Future<void> getUserImageUrlAndName() async {
+  QuerySnapshot snapshot = await FirebaseFirestore.instance.collection('register').where('uid', isEqualTo: userUid).get();
+  if (snapshot.size > 0) {
+    DocumentSnapshot doc = await FirebaseFirestore.instance.collection('register').doc(snapshot.docs[0].id).get();
+    if (doc.exists) {
+
+      doc.get('name');
+      return doc.get('name');
+    }
+    else {
+    }
+  }
+  else{
+  }
+
+}Future<String> getUserImageUrl() async {
+  QuerySnapshot snapshot = await FirebaseFirestore.instance.collection('register').where('uid', isEqualTo: userUid).get();
+  if (snapshot.size > 0) {
+    DocumentSnapshot doc = await FirebaseFirestore.instance.collection('register').doc(snapshot.docs[0].id).get();
+    if (doc.exists) {
+      return doc.get('imageUrl');
+      return doc.get('imageUrl');
+    }
+    else {
+      return ' ';
+    }
+  }
+  else{
+    return ' ';
+  }
+}
 
 /////CHECK FOR MULTIPLE REQUEST FROM SINGLE USER
 Future<bool> duplicates() async {
@@ -136,6 +204,159 @@ Future<bool> duplicates() async {
 //             child: const Text('Submit'),
 //             onPressed: () {accept(widget.time, widget.name);},
 //           ),
+//         ],
+//       );
+//     },
+//   );
+// }
+
+// @override
+// void initState() {
+//   isRequestedUpdate();
+//   super.initState();
+// }
+// Future<void> isRequestedUpdate () async {
+//   QuerySnapshot userQuerySnapshot = await FirebaseFirestore.instance.collection('Users').get();
+//   QuerySnapshot pendingQuerySnapshot = await FirebaseFirestore.instance.collection('pending').get();
+//   List<QueryDocumentSnapshot> userDoc = userQuerySnapshot.docs;
+//   List<QueryDocumentSnapshot> pendingDoc = pendingQuerySnapshot.docs;
+//   for (var document in userDoc) {
+//     for (var doc in pendingDoc) {
+//       if(doc['senderUid']==userUid && document['Uid']==doc['receiverUid']){
+//         FirebaseFirestore.instance.collection('Users').doc(document.id).update({
+//           'isRequested': true,
+//         }).then((value) {
+//           print('Document updated successfully.');
+//         }).catchError((error) {
+//           print('Failed to update document: $error');
+//         });
+//       }
+//     }
+//   }
+// }
+
+// Future<List<QueryDocumentSnapshot>> fetchFirestoreDocuments() async {
+//   final querySnapshot = await FirebaseFirestore.instance.collection('Users').where('Uid', isNotEqualTo: userUid).get();
+//   List<QueryDocumentSnapshot> documents = querySnapshot.docs;
+//   return documents;
+// }
+
+
+// Future<void> getFCMByUid() async {
+//   QuerySnapshot snapshot = await FirebaseFirestore.instance.collection('fcm').where('uid', isEqualTo: widget.cardUid).get();
+//   if (snapshot.size > 0) {
+//     DocumentSnapshot doc = await FirebaseFirestore.instance.collection('fcm').doc(snapshot.docs[0].id).get();
+//     if (doc.exists) {
+//       setState(() {
+//         widget.otherFCM = doc.get('token');
+//       });
+//     }
+//     else {
+//       print('Document with ID does not exist.');
+//     }
+//   }
+//   else {
+//     print('no_doc');
+//   }
+// }
+
+
+
+
+/////CREATE NEW REQUEST
+// void newRequest() {
+//   showDialog(
+//     context: context,
+//     builder: (BuildContext context) {
+//       Size screenSize = MediaQuery.of(context).size;
+//       return AlertDialog(
+//         content: Container(
+//          width: screenSize.width*0.6,
+//          height: screenSize.height*0.4,
+//           child: Column(
+//             children: [
+//               Stack(
+//                 alignment: Alignment.center,
+//                 children: [
+//                   Opacity(
+//                     opacity: .5,
+//                     child: Container(
+//                       height: 32,
+//                       width: 250,
+//                       decoration: BoxDecoration(
+//                           color: Colors.grey[400],
+//                           borderRadius: BorderRadius.circular(50)
+//                       ),
+//                     ),
+//                   ),
+//                   SizedBox(
+//                     height: 71,
+//                     width: 180,
+//                     child: Row(
+//                       mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+//                       children: [
+//                         ScrollHour(),
+//                         const SizedBox(width: 20, child: Text(' :', style: TextStyle(fontSize: 24),),),
+//                         ScrollMinute(),
+//                         const SizedBox(width: 20,),
+//                         ScrollPmAm(),
+//                       ],
+//                     ),
+//                   ),
+//                 ],
+//               ),
+//               const SizedBox(height: 20,),
+//               CustomTextField(controller: fromController, obscureText: false, boxHeight: 35, hintText: 'From',),
+//               const SizedBox(height: 10,),
+//               CustomTextField(controller: toController, obscureText: false, boxHeight: 35, hintText: 'To',),
+//               const SizedBox(height: 20,),
+//               DropdownButton<String>(
+//                 borderRadius: BorderRadius.circular(20),
+//                 iconSize: 0,
+//                 dropdownColor: Colors.grey[100],
+//                 value: _selectedItem,
+//                 elevation: 1,
+//                 onChanged: (String? newValue) {
+//                   setState(() {
+//                     _selectedItem = newValue;
+//                   });
+//                   print(_selectedItem);
+//                   },
+//                 items: <String>['Mode', 'Auto', 'Bus', 'Car', 'Train', 'Flight'].map((String value) {
+//                   return DropdownMenuItem<String>(
+//                     value: value,
+//                     child: Column(
+//                       children: [
+//                         Container(
+//                             height: 35,
+//                             width: 80,
+//                             decoration: BoxDecoration(
+//                               borderRadius: BorderRadius.circular(10),
+//                               color: Colors.grey[200],
+//                             ),
+//                             child: Image.asset('assets/$value.png')
+//                         ),
+//                         const SizedBox(height: 2,)
+//                       ],
+//                     ),
+//                   );
+//                 }).toList(),
+//               ),
+//             ],
+//           ),
+//         ),
+//         actions: [
+//           TextButton(
+//             child: const Text('Cancel'),
+//             onPressed: () {Navigator.pop(context);},
+//           ),
+//           TextButton(
+//             child: const Text('Submit'),
+//             onPressed: () {
+//               submitDetails();
+//               },
+//           ),
+//
 //         ],
 //       );
 //     },

@@ -1,12 +1,12 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
-import 'Components/request_card.dart';
-import 'constants.dart';
+import '../Components/request_card.dart';
+import '../constants.dart';
 
 class AcceptedTab extends StatefulWidget {
   const AcceptedTab({super.key});
   @override
-  _AcceptedTabState createState() => _AcceptedTabState();
+  State<AcceptedTab> createState() => _AcceptedTabState();
 }
 
 class _AcceptedTabState extends State<AcceptedTab> {
@@ -29,7 +29,9 @@ class _AcceptedTabState extends State<AcceptedTab> {
           itemBuilder: (BuildContext context, int index) {
             var name = documents[index].get('senderName');
             var requestSender = documents[index].get('senderUid');
-            return RequestCard(name: '$name is requesting', requestSender: requestSender,);
+            var isAccepted = documents[index].get('isAccepted');
+            var senderImageUrl = documents[index].get('senderImageUrl');
+            return RequestCard(name: name, requestSender: requestSender, isAccepted: isAccepted, senderImageUrl: senderImageUrl);
           },
         );
       },

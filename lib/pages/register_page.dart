@@ -1,11 +1,17 @@
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_image_compress/flutter_image_compress.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:transport/Components/Image_card.dart';
+import 'package:transport/Components/custom_textfield.dart';
 import 'dart:io';
 import '../Components/button.dart';
 import '../constants.dart';
+import 'package:path/path.dart' as path;
+import 'package:path_provider/path_provider.dart';
 
 class RegisterUser extends StatefulWidget {
   RegisterUser({Key? key}) : super(key: key);
@@ -15,40 +21,65 @@ class RegisterUser extends StatefulWidget {
 
 class _RegisterUserState extends State<RegisterUser> {
   final TextEditingController nameController = TextEditingController();
+  final TextEditingController lastNameController = TextEditingController();
   final TextEditingController emailController = TextEditingController();
   final TextEditingController passwordController = TextEditingController();
   late String email;
   late String name;
-  late String imageUrl = 'https://firebasestorage.googleapis.com/v0/b/traveldost-f6a2d.appspot.com/o/images%2Fprofile.jpg?alt=media&token=34c16029-42ff-4d31-8aba-f2e5f114f314';
+  late String targetPath;
+  late String imageUrl = ' ';
+  File? compressedImageFile;
 
-  ////UPLOAD IMAGE AND GET URL
+  ////UPLOAD IMAGE
   Future<void> uploadImageGetUrl() async {
-    ImagePicker picker = ImagePicker();
-    XFile? pickedImage = await picker.pickImage(source: ImageSource.gallery);
-    String uniqueName = DateTime.now().microsecondsSinceEpoch.toString();
-    Reference referenceImage = FirebaseStorage.instance.ref().child('images').child(uniqueName);
-    try {
-      await referenceImage.putFile(File(pickedImage!.path));
-      setState(() async {
-        imageUrl = await referenceImage.getDownloadURL();
+    final XFile? imageFile = await ImagePicker().pickImage(source: ImageSource.gallery);
+    if (imageFile != null) {
+      File compressedImage = await compressImage(imageFile.path);
+      setState(() {
+        compressedImageFile = compressedImage;
       });
+      print("FILENAME ${compressedImage.path}");
     }
-    catch(error){
-      print('CANNOT UPLOAD IMAGE AND GET URL');
-    }
+
   }
 
-  /////REGISTER WITH EMAIL AND PASSWORD
-  void registerWithEmailAndPassword(String email, String password,  String name) async {
+  ////GET IMAGE URL
+  Future<void> getImageUrl(File compressedImage) async {
+    Reference storageReference = FirebaseStorage.instance.ref().child('images').child(DateTime.now().microsecondsSinceEpoch.toString());
+    UploadTask uploadTask = storageReference.putFile(compressedImage);
+    String uploadedImageUrl = await (await uploadTask).ref.getDownloadURL();
+    setState(() {
+      imageUrl = uploadedImageUrl;
+    });
+  }
+
+  ////COMPRESS IMAGE BEFORE UPLOAD
+  Future<File> compressImage(String imagePath) async {
+    final appDir = await getApplicationSupportDirectory();
+    final tempDir = Directory("${appDir.path}/temp");
+    await tempDir.create(recursive: true);
+    String fileName = path.basename(imagePath);
+    File compressedImage = File('${tempDir.path}/img_$fileName');
+    await FlutterImageCompress.compressAndGetFile(
+      imagePath,
+      compressedImage.path,
+      quality: 20,
+    );
+    return compressedImage;
+  }
+
+  ////REGISTER USER
+  void registerWithEmailAndPassword(String email, String password,  String firstName, String lastName) async {
     try {
       UserCredential userCredential = await FirebaseAuth.instance.createUserWithEmailAndPassword(
         email: email,
         password: password,
       );
+      await getImageUrl(compressedImageFile!);
       User? user = userCredential.user;
       await FirebaseFirestore.instance.collection('register').add({
         'email': email,
-        'name': name,
+        'name': '$firstName $lastName',
         'uid' : user?.uid,
         'imageUrl' : imageUrl,
       }).then((value) => print("USER REGISTERED SUCCESSFULLY")).catchError((error) => print("REGISTRATION FAILED: $error"));
@@ -56,7 +87,11 @@ class _RegisterUserState extends State<RegisterUser> {
         setState(() {
           userUid=user.uid;
           userImageUrl=imageUrl;
+          userName = '$firstName $lastName';
         });
+        print('USER UID IS : $userUid');
+        print('USER IMAGE URL IS : $userImageUrl');
+        print('USER NAME IS : $userName');
         Navigator.pushNamed(context, '/homepage');
       }
 
@@ -64,6 +99,7 @@ class _RegisterUserState extends State<RegisterUser> {
       // Handle registration failure
     }
     nameController.clear();
+    lastNameController.clear();
     emailController.clear();
     passwordController.clear();
   }
@@ -80,73 +116,72 @@ class _RegisterUserState extends State<RegisterUser> {
                 children: [
                   const Text('REGISTER HERE'),
                   const SizedBox(height: 30,),
-                  Stack(
-                    alignment: Alignment.center,
-                    children: [
-                      SizedBox(
+                  SizedBox(
+                    height: 100,
+                    width: 100,
+                    child: (compressedImageFile!=null)
+                        ? Stack(
+                        alignment: Alignment.center,
+                        children: [
+                          ImageCard(height: 90, width: 90, radius: 50, imageProvider: FileImage(compressedImageFile!)),
+                          Container(
+                            clipBehavior: Clip.hardEdge,
+                            width: 110,
+                            height: 110,
+                            decoration: BoxDecoration(
+                              border: Border.all(color: Colors.blue, width: 2),
+                              borderRadius: BorderRadius.circular(55),
+                            ),
+                          ),
+                          Row(
+                            children: [
+                              const SizedBox(width: 67,),
+                              Column(
+                                children: [
+                                  const SizedBox(height: 67,),
+                                  Container(
+                                      height: 32,
+                                      width: 32,
+                                      decoration: BoxDecoration(
+                                        color: Colors.blue[300],
+                                        borderRadius: BorderRadius.circular(18),
+                                      ),
+                                      child: IconButton(padding: EdgeInsets.zero, onPressed: () {uploadImageGetUrl();}, icon: const Icon(Icons.edit, size: 20, color: Colors.white,),)),
+                                ],
+                              ),
+                            ],
+                          ),
+                        ])
+                        : Container(
                         height: 100,
                         width: 100,
-                        child: CircleAvatar(
-                          foregroundImage: NetworkImage(imageUrl),
+                        decoration: BoxDecoration(
+                          color: Colors.grey[300],
+                          borderRadius: BorderRadius.circular(50),
                         ),
-                      ),
-                      IconButton(onPressed: (){uploadImageGetUrl();}, icon: const Icon(Icons.camera_alt_rounded,size: 30,)),
-                    ]
+                        child: IconButton(
+                            color: Colors.grey[750],
+                            onPressed: (){uploadImageGetUrl();},
+                            icon: const Icon(Icons.add_a_photo_outlined,size: 40,))),
                   ),
                   const SizedBox(height: 20,),
-                  TextField(
-                    controller: nameController,
-                    decoration: const InputDecoration(
-                      labelText: 'Name',
-                      enabledBorder: OutlineInputBorder(
-                        borderSide: BorderSide(color: Colors.lightBlue, width: 0,),
-                        borderRadius: BorderRadius.all(Radius.circular(20)),
-                      ),
-                      focusedBorder: OutlineInputBorder(
-                        borderSide: BorderSide(color: Colors.lightBlue, width: 1,),
-                        borderRadius: BorderRadius.all(Radius.circular(10)),
-                      ),
-                      filled: true,
-                    ),
+                  Row(
+                    children: [
+                      Expanded(child: CustomTextField(controller: nameController, labelText: 'First Name', obscureText: false, boxHeight: 45,)),
+                      const SizedBox(width: 10,),
+                      Expanded(child: CustomTextField(controller: lastNameController, labelText: 'Last Name', obscureText: false, boxHeight: 45,)),
+                    ],
                   ),
-                  const SizedBox(height: 10,),
-                  TextField(
-                    controller: emailController,
-                    decoration: const InputDecoration(
-                      labelText: 'Email',
-                      enabledBorder: OutlineInputBorder(
-                        borderSide: BorderSide(color: Colors.lightBlue, width: 0,),
-                        borderRadius: BorderRadius.all(Radius.circular(20)),
-                      ),
-                      focusedBorder: OutlineInputBorder(
-                        borderSide: BorderSide(color: Colors.lightBlue, width: 1,),
-                        borderRadius: BorderRadius.all(Radius.circular(10)),
-                      ),
-                      filled: true,
-                    ),
-                  ),
-                  const SizedBox(height: 10,),
-                  TextField(
-                    controller:passwordController,
-                    decoration: const InputDecoration(
-                      labelText: 'Create a new password',
-                      enabledBorder: OutlineInputBorder(
-                        borderSide: BorderSide(color: Colors.lightBlue, width: 0,),
-                        borderRadius: BorderRadius.all(Radius.circular(20)),
-                      ),
-                      focusedBorder: OutlineInputBorder(
-                        borderSide: BorderSide(color: Colors.lightBlue, width: 1,),
-                        borderRadius: BorderRadius.all(Radius.circular(10)),
-                      ),
-                      filled: true,
-                    ),
-                  ),
+                  const SizedBox(height: 14,),
+                  CustomTextField(controller: emailController, labelText: 'Email', hintText: 'Create a new email id', obscureText: false, boxHeight: 45,),
+                  const SizedBox(height: 14,),
+                  CustomTextField(controller: passwordController, labelText: 'Password', hintText: 'Create a new password', obscureText: true, boxHeight: 45,),
                   const SizedBox(height: 30,),
-                  Button(buttonText: 'Register', textColor: Colors.lightBlue, buttonBgColor: Colors.lightGreenAccent, onPressed:(){registerWithEmailAndPassword(emailController.text, passwordController.text, nameController.text);}, height: 50, width: screenSize.width*0.9,),
+                  Button(buttonText: 'Register', textColor: Colors.lightBlue, buttonBgColor: Colors.lightGreenAccent, onPressed:(){registerWithEmailAndPassword(emailController.text, passwordController.text, nameController.text, lastNameController.text);}, height: 50, width: screenSize.width*0.9, borderRadius: 15,),
                   const SizedBox(height: 20,),
                   const Text('or'),
                   const SizedBox(height: 20,),
-                  Button(buttonText: 'Login', textColor: Colors.blue, buttonBgColor: Colors.lightGreenAccent, onPressed: (){Navigator.pushNamed(context, '/loginpage');}, height: 50, width: screenSize.width*0.9,)
+                  Button(buttonText: 'Login', textColor: Colors.blue, buttonBgColor: Colors.lightGreenAccent, onPressed: (){Navigator.pushNamed(context, '/loginpage');}, height: 50, width: screenSize.width*0.9, borderRadius: 15,)
                 ],
               ),
             ),

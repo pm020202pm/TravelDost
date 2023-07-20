@@ -1,9 +1,10 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:transport/home_page.dart';
+import 'package:transport/Components/custom_textfield.dart';
 import '../Components/button.dart';
 import '../constants.dart';
+import 'home_page.dart';
 
 class LoginPage extends StatefulWidget {
   LoginPage({Key? key}) : super(key: key);
@@ -17,26 +18,7 @@ class _LoginPageState extends State<LoginPage> {
   final TextEditingController passwordController = TextEditingController();
 
   /////GET USER IMAGE URL
-  Future<void> getUserImageUrlAndName() async {
-    QuerySnapshot snapshot = await FirebaseFirestore.instance.collection('register').where('uid', isEqualTo: userUid).get();
-    if (snapshot.size > 0) {
-      DocumentSnapshot doc = await FirebaseFirestore.instance.collection('register').doc(snapshot.docs[0].id).get();
-      if (doc.exists) {
-        setState(() {
-          userImageUrl= doc.get('imageUrl');
-          userName= doc.get('name');
-        });
-        print('USER IMAGE URL IS : $userImageUrl');
-        print('USER NAME IS : $userName');
-      }
-      else {
-        print('SENDER NAME NOT FOUND');
-      }
-    }
-    else {
-      print('NO DOC IN REGISTER FOUND!');
-    }
-  }
+
 
   /////SIGN IN WITH EMAIL AND PASSWORD
   void signInWithEmailAndPassword(String email, String password) async {
@@ -50,8 +32,22 @@ class _LoginPageState extends State<LoginPage> {
         setState(() {
           userUid=user.uid;
         });
+        QuerySnapshot snapshot = await FirebaseFirestore.instance.collection('register').where('uid', isEqualTo: userUid).get();
+        if (snapshot.size > 0) {
+          DocumentSnapshot doc = await FirebaseFirestore.instance.collection('register').doc(snapshot.docs[0].id).get();
+          if (doc.exists) {
+            setState(() {
+              userName =doc.get('name');
+              userImageUrl= doc.get('imageUrl');
+            });
+          }
+          else {}
+        }
+        else{}
         print('USER UID IS : $userUid');
-        await getUserImageUrlAndName();
+        print('USER NAME IS : $userName');
+        print('USER Image IS : $userImageUrl');
+        // await getUserImageUrlAndName();
         if(await duplicates()){
           setState(() {
             myList=true;
@@ -79,44 +75,15 @@ class _LoginPageState extends State<LoginPage> {
                 children: [
                   const Text('LOGIN HERE'),
                   const SizedBox(height: 30,),
-                  TextField(
-                    controller: emailController,
-                    decoration: const InputDecoration(
-                      labelText: 'Email',
-                      enabledBorder: OutlineInputBorder(
-                        borderSide: BorderSide(color: Colors.lightBlue, width: 0,),
-                        borderRadius: BorderRadius.all(Radius.circular(20)),
-                      ),
-                      focusedBorder: OutlineInputBorder(
-                        borderSide: BorderSide(color: Colors.lightBlue, width: 1,),
-                        borderRadius: BorderRadius.all(Radius.circular(10)),
-                      ),
-                      filled: true,
-                    ),
-                  ),
-                  const SizedBox(height: 10,),
-                  TextField(
-                    controller: passwordController,
-                    obscureText: true,
-                    decoration: const InputDecoration(
-                      labelText: 'Password',
-                      enabledBorder: OutlineInputBorder(
-                        borderSide: BorderSide(color: Colors.lightBlue, width: 0,),
-                        borderRadius: BorderRadius.all(Radius.circular(20)),
-                      ),
-                      focusedBorder: OutlineInputBorder(
-                        borderSide: BorderSide(color: Colors.lightBlue, width: 1,),
-                        borderRadius: BorderRadius.all(Radius.circular(10)),
-                      ),
-                      filled: true,
-                    ),
-                  ),
+                  CustomTextField(controller: emailController, obscureText: false, labelText: 'Email', boxHeight: 45, ),
+                  const SizedBox(height: 14),
+                  CustomTextField(controller: passwordController, obscureText: true, labelText: 'Password', boxHeight: 45, ),
                   const SizedBox(height: 30,),
-                  Button(buttonText: 'Login', textColor: Colors.lightBlue, buttonBgColor: Colors.lightGreenAccent, onPressed:(){signInWithEmailAndPassword(emailController.text, passwordController.text);}, height: 50, width: screenSize.width*0.9,),
+                  Button(buttonText: 'Login', textColor: Colors.lightBlue, buttonBgColor: Colors.lightGreenAccent, onPressed:(){signInWithEmailAndPassword(emailController.text, passwordController.text);}, height: 45, width: screenSize.width*0.9, borderRadius: 15,),
                   const SizedBox(height: 20,),
                   const Text('or'),
                   const SizedBox(height: 20,),
-                  Button(buttonText: 'Register', textColor: Colors.lightBlue, buttonBgColor: Colors.lightGreenAccent, onPressed:(){Navigator.pushNamed(context, '/registerpage');}, height: 50, width: screenSize.width*0.9,),
+                  Button(buttonText: 'Register', textColor: Colors.lightBlue, buttonBgColor: Colors.lightGreenAccent, onPressed:(){Navigator.pushNamed(context, '/registerpage');}, height: 45, width: screenSize.width*0.9, borderRadius: 15,),
                 ],
               ),
           ),

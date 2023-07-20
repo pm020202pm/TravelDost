@@ -1,12 +1,12 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:transport/Components/user_card.dart';
-import 'constants.dart';
+import '../constants.dart';
 
 class PendingTab extends StatefulWidget {
   const PendingTab({super.key});
   @override
-  _PendingTabState createState() => _PendingTabState();
+  State<PendingTab> createState() => _PendingTabState();
 }
 
 class _PendingTabState extends State<PendingTab> {
@@ -33,7 +33,8 @@ class _PendingTabState extends State<PendingTab> {
             var time = documents[index].get('time');
             var imageUrl = documents[index].get('imageUrl');
             var isAccepted = documents[index].get('isAccepted');
-            return UserCard(name: name, time: time, isRequested: true, imageUrl:imageUrl, cardUid: '', otherFCM: '', isAccepted: isAccepted,);
+            var isDenied = documents[index].get('isDenied');
+            return UserCard(name: name, time: time, isRequested: true, imageUrl:imageUrl, cardUid: '', otherFCM: '', isAccepted: isAccepted, isDenied: isDenied, vehicle: 'Auto', fromPlace: ' ', toPlace: ' ', message: ' ', isMessage: true,);
           },
         );
       },
