@@ -19,25 +19,28 @@ class _PendingTabState extends State<PendingTab> {
 
   @override
   Widget build(BuildContext context) {
-    return FutureBuilder<List<QueryDocumentSnapshot>>(
-      future: fetchRequestsDocuments(),
-      builder: (BuildContext context,
-          AsyncSnapshot<List<QueryDocumentSnapshot>> snapshot) {
-        if (snapshot.connectionState == ConnectionState.waiting) { return const Text("Loading..."); }
-        if (snapshot.hasError) {return Text('Error: ${snapshot.error}');}
-        List<QueryDocumentSnapshot> documents = snapshot.data!;
-        return ListView.builder(
-          itemCount: documents.length,
-          itemBuilder: (BuildContext context, int index) {
-            var name = documents[index].get('name');
-            var time = documents[index].get('time');
-            var imageUrl = documents[index].get('imageUrl');
-            var isAccepted = documents[index].get('isAccepted');
-            var isDenied = documents[index].get('isDenied');
-            return UserCard(name: name, time: time, isRequested: true, imageUrl:imageUrl, cardUid: '', otherFCM: '', isAccepted: isAccepted, isDenied: isDenied, vehicle: 'Auto', fromPlace: ' ', toPlace: ' ', message: ' ', isMessage: true,);
-          },
-        );
-      },
+    return Padding(
+      padding: EdgeInsets.fromLTRB(16, 40, 16, 16),
+      child: FutureBuilder<List<QueryDocumentSnapshot>>(
+        future: fetchRequestsDocuments(),
+        builder: (BuildContext context,
+            AsyncSnapshot<List<QueryDocumentSnapshot>> snapshot) {
+          if (snapshot.connectionState == ConnectionState.waiting) { return const Text("Loading..."); }
+          if (snapshot.hasError) {return Text('Error: ${snapshot.error}');}
+          List<QueryDocumentSnapshot> documents = snapshot.data!;
+          return ListView.builder(
+            itemCount: documents.length,
+            itemBuilder: (BuildContext context, int index) {
+              var name = documents[index].get('name');
+              var time = documents[index].get('time');
+              var imageUrl = documents[index].get('imageUrl');
+              var isAccepted = documents[index].get('isAccepted');
+              var isDenied = documents[index].get('isDenied');
+              return UserCard(name: name, time: time, isRequested: true, imageUrl:imageUrl, cardUid: '', otherFCM: '', isAccepted: isAccepted, isDenied: isDenied, vehicle: 'Auto', fromPlace: ' ', toPlace: ' ', message: ' ', isMessage: true,);
+            },
+          );
+        },
+      ),
     );
   }
 }

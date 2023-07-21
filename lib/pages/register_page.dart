@@ -92,7 +92,8 @@ class _RegisterUserState extends State<RegisterUser> {
         print('USER UID IS : $userUid');
         print('USER IMAGE URL IS : $userImageUrl');
         print('USER NAME IS : $userName');
-        Navigator.pushNamed(context, '/homepage');
+        Navigator.pushReplacementNamed(context, '/homepage')  ;
+        // Navigator.pushNamed(context, '/homepage');
       }
 
     } catch (e) {

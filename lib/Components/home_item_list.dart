@@ -11,9 +11,9 @@ class HomeList extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        const SizedBox(height: 150,),
+        const SizedBox(height: 210,),
         Padding(
-          padding: const EdgeInsets.fromLTRB(10, 5, 0, 0),
+          padding: const EdgeInsets.fromLTRB(16, 5, 0, 0),
           child: (isMyCardExpanded==false)? const Text('Others Request'): Container(),
         ),
         Expanded(
@@ -42,6 +42,7 @@ class HomeList extends StatelessWidget {
                       var fromPlace = userDocs[index]['from'];
                       var toPlace = userDocs[index]['to'];
                       var message = userDocs[index]['message'];
+                      var date = userDocs[index]['date'];
 
                       bool isRequested;
                       bool isAccepted;
@@ -70,7 +71,7 @@ class HomeList extends StatelessWidget {
                       } else{
                         isMessage= true;
                       }
-                      return UserCard(name: name, time: 'Leaving at $hours : $minute $pmam', isRequested: isRequested, imageUrl: imageUrl, cardUid: cardUid, otherFCM: '', isAccepted: isAccepted, isDenied: isDenied, vehicle: vehicle, fromPlace: fromPlace, toPlace: toPlace, message: message, isMessage: isMessage,);
+                      return UserCard(name: name, time: 'Leaving at $hours : $minute $pmam on $date', isRequested: isRequested, imageUrl: imageUrl, cardUid: cardUid, otherFCM: '', isAccepted: isAccepted, isDenied: isDenied, vehicle: vehicle, fromPlace: fromPlace, toPlace: toPlace, message: message, isMessage: isMessage,);
                     },
                   );
                 },

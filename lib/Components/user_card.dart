@@ -150,9 +150,9 @@ class _UserCardState extends State<UserCard> {
               ),
             ],
           ),
-          AnimatedContainer(
+          Container(
               width: screenSize.width*0.9,
-              height: 110,
+              height: 105,
               decoration: BoxDecoration(
                 boxShadow: const [
                   BoxShadow(
@@ -165,102 +165,101 @@ class _UserCardState extends State<UserCard> {
                   color: Colors.grey[200],
                   borderRadius: BorderRadius.circular(20)
               ),
-              duration: const Duration(milliseconds: 500),
               child: Padding(
                 padding: const EdgeInsets.all(8.0),
                 child: Row(
                   children: [
                     ImageCard(height: 70, width: 70, radius: 18, imageProvider: NetworkImage(widget.imageUrl),),
                     const SizedBox(width: 15,),
-                    Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text('Name: ${widget.name}'),
-                            const SizedBox(height: 4,),
-                            Text(widget.time),
-                            Row(children: [
-                              Text(widget.fromPlace, style: TextStyle(fontSize: 12, color: Colors.grey[600], fontWeight: FontWeight.bold),),
-                              const SizedBox(width: 5,),
-                              const Icon(Icons.linear_scale, color: Colors.grey),
-                              const SizedBox(width: 5,),
-                              Image.asset('assets/${widget.vehicle}.png', height: 18,),
-                              const SizedBox(width: 5,),
-                              const Icon(Icons.linear_scale, color: Colors.grey),
-                              const SizedBox(width: 5,),
-                              Text(widget.toPlace, style: TextStyle(fontSize: 12, color: Colors.grey[600], fontWeight: FontWeight.bold),),
-                            ],),
-                          ],
-                        ),
-                        if(widget.isAccepted && widget.isDenied==false)
-                          Button(
-                            buttonText: 'Accepted',
-                            textColor: Colors.green[700],
-                            buttonBgColor: Colors.green[200],
-                            onPressed: (){},
-                            height: 32, width: 90, borderRadius: 15,
-                            splashColor: Colors.green[200],
-                          )
-                        else if(widget.isAccepted==false && widget.isDenied)
-                          Button(
-                            buttonText: 'Denied',
-                            textColor: Colors.grey[700],
-                            buttonBgColor: Colors.grey[300],
-                            onPressed: (){},
-                            height: 32, width: 90, borderRadius: 15,
-                            splashColor: Colors.grey[300],
-                          )
-                        else
-                          Row(
+                    Container(
+                      width: screenSize.width*0.61,
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                              Button(
-                                buttonText: (widget.isRequested || isRequestedLocal)? 'Requested' : 'Request',
-                                textColor: (widget.isRequested || isRequestedLocal)? Colors.grey[700]: Colors.blue,
-                                buttonBgColor:(widget.isRequested || isRequestedLocal)? Colors.grey[350] : Colors.blue[100],
-                                onPressed: () async {if(widget.isRequested==false){await getSenderName(); sendRequest();} else{}},
-                                height: 32, width: 80, borderRadius: 15,
-                                splashColor: (widget.isRequested || isRequestedLocal)? Colors.grey[350] : Colors.blue[200],
-                              ),
-                              const SizedBox(width: 10,),
-                              if(widget.isRequested || isRequestedLocal)
-                                Button(
-                                  buttonText: 'Cancel' ,
-                                  textColor: Colors.red,
-                                  buttonBgColor: Colors.red[100],
-                                  onPressed: () {cancelRequest();},
-                                  height: 32, width: 66, borderRadius: 15,
-                                  splashColor: Colors.red[200],
-                                ),
-                              if(widget.isMessage)
-                                Row(
-                                  children: [
-                                    const SizedBox(width: 10,),
-                                    Container(
-                                      alignment: Alignment.center,
-                                      height: 32,
-                                      width: 45,
-                                      decoration: BoxDecoration(
-                                        border: Border.all(width: 2, color: Colors.lightGreen),
-                                        color: Colors.green[100],
-                                        borderRadius: BorderRadius.circular(20)
-                                      ),
-                                      child: IconButton(
-                                        padding: EdgeInsets.zero,
-                                          onPressed: (){
-                                            setState(() {
-                                              isExpanded=!isExpanded;
-                                            });
-                                          },
-                                          icon: Icon(Icons.message, color: Colors.green[800],size: 22,),
-                                      ),
-                                    ),
-                                  ],
-                                ),
+                              Text(widget.name.toUpperCase(), style: TextStyle(fontSize: 14, fontWeight: FontWeight.w500, color: Colors.grey[700]),),
+                              const SizedBox(height: 4,),
+                              Text(widget.time, style: TextStyle(fontSize: 12),),
+                              Row(children: [
+                                Text(widget.fromPlace.toUpperCase(), style: TextStyle(fontSize: 11, color: Colors.grey[600], fontWeight: FontWeight.w500),),
+                                const SizedBox(width: 5,),
+                                const Icon(Icons.linear_scale, color: Colors.grey),
+                                const SizedBox(width: 5,),
+                                Image.asset('assets/${widget.vehicle}.png', height: 16,),
+                                const SizedBox(width: 5,),
+                                const Icon(Icons.linear_scale, color: Colors.grey),
+                                const SizedBox(width: 5,),
+                                Text(widget.toPlace.toUpperCase(), style: TextStyle(fontSize: 11, color: Colors.grey[600], fontWeight: FontWeight.w500),),
+                              ],),
                             ],
-                          )
-                      ],
+                          ),
+                          if(widget.isAccepted && widget.isDenied==false)
+                            Button(
+                              buttonText: 'Accepted',
+                              textColor: Colors.green[700],
+                              buttonBgColor: Colors.green[200],
+                              onPressed: (){},
+                              height: 28, width: 90, borderRadius: 15,
+                              splashColor: Colors.green[200],
+                            )
+                          else if(widget.isAccepted==false && widget.isDenied)
+                            Button(
+                              buttonText: 'Denied',
+                              textColor: Colors.grey[700],
+                              buttonBgColor: Colors.grey[300],
+                              onPressed: (){},
+                              height: 28, width: 90, borderRadius: 15,
+                              splashColor: Colors.grey[300],
+                            )
+                          else
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.start,
+                              children: [
+                                Button(
+                                  buttonText: (widget.isRequested || isRequestedLocal)? 'Requested' : 'Request',
+                                  textColor: (widget.isRequested || isRequestedLocal)? Colors.grey[700]: Colors.blue,
+                                  buttonBgColor:(widget.isRequested || isRequestedLocal)? Colors.grey[350] : Colors.blue[100],
+                                  onPressed: () async {if(widget.isRequested==false){await getSenderName(); sendRequest();} else{}},
+                                  height: 28, width: 80, borderRadius: 15,
+                                  splashColor: (widget.isRequested || isRequestedLocal)? Colors.grey[350] : Colors.blue[200],
+                                ),
+                                const SizedBox(width: 10,),
+                                if(widget.isRequested || isRequestedLocal)
+                                  Button(
+                                    buttonText: 'Cancel' ,
+                                    textColor: Colors.red,
+                                    buttonBgColor: Colors.red[100],
+                                    onPressed: () {cancelRequest();},
+                                    height: 28, width: 66, borderRadius: 15,
+                                    splashColor: Colors.red[200],
+                                  ),
+                                const SizedBox(width: 10,),
+                                if(widget.isMessage)
+                                  Container(
+                                    alignment: Alignment.center,
+                                    height: 28,
+                                    width: 45,
+                                    decoration: BoxDecoration(
+                                      border: Border.all(width: 2, color: Colors.lightGreen),
+                                      color: Colors.green[100],
+                                      borderRadius: BorderRadius.circular(20)
+                                    ),
+                                    child: IconButton(
+                                      padding: EdgeInsets.zero,
+                                        onPressed: (){
+                                          setState(() {
+                                            isExpanded=!isExpanded;
+                                          });
+                                        },
+                                        icon: Icon(Icons.message, color: Colors.green[800],size: 20,),
+                                    ),
+                                  ),
+                              ],
+                            )
+                        ],
+                      ),
                     ),
 
                   ],

@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
 class Button extends StatelessWidget {
-  Button({Key? key, required this.buttonText, required this.textColor, required this.buttonBgColor, required this.onPressed, required this.height, required this.width, required this.borderRadius, this.splashColor}) : super(key: key);
+  Button({Key? key, required this.buttonText, required this.textColor, required this.buttonBgColor, required this.onPressed, required this.height, required this.width, required this.borderRadius, this.splashColor, this.fontSize, this.fontWeight}) : super(key: key);
   final String buttonText;
   final Color? textColor;
   final Color? buttonBgColor;
@@ -10,6 +10,8 @@ class Button extends StatelessWidget {
   final double height;
   final double width;
   final double borderRadius;
+  final double? fontSize;
+  final FontWeight? fontWeight;
 
   @override
   Widget build(BuildContext context) {
@@ -27,7 +29,7 @@ class Button extends StatelessWidget {
           decoration: BoxDecoration(
             borderRadius: BorderRadius.circular(borderRadius),
           ),
-          child: Text(buttonText, style: TextStyle(color: textColor),),
+          child: Text(buttonText, style: TextStyle(color: textColor, fontSize: fontSize, fontWeight: fontWeight),),
         ),
       ),
     );

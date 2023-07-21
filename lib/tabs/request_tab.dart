@@ -18,23 +18,26 @@ class _AcceptedTabState extends State<AcceptedTab> {
 
   @override
   Widget build(BuildContext context) {
-    return FutureBuilder<List<QueryDocumentSnapshot>>(
-      future: fetchRequestsDocuments(),
-      builder: (BuildContext context, AsyncSnapshot<List<QueryDocumentSnapshot>> snapshot) {
-        if (snapshot.connectionState == ConnectionState.waiting) { return const Text("Loading..."); }
-        if (snapshot.hasError) {return Text('Error: ${snapshot.error}');}
-        List<QueryDocumentSnapshot> documents = snapshot.data!;
-        return ListView.builder(
-          itemCount: documents.length,
-          itemBuilder: (BuildContext context, int index) {
-            var name = documents[index].get('senderName');
-            var requestSender = documents[index].get('senderUid');
-            var isAccepted = documents[index].get('isAccepted');
-            var senderImageUrl = documents[index].get('senderImageUrl');
-            return RequestCard(name: name, requestSender: requestSender, isAccepted: isAccepted, senderImageUrl: senderImageUrl);
-          },
-        );
-      },
+    return Padding(
+      padding: EdgeInsets.fromLTRB(16, 40, 16, 16),
+      child: FutureBuilder<List<QueryDocumentSnapshot>>(
+        future: fetchRequestsDocuments(),
+        builder: (BuildContext context, AsyncSnapshot<List<QueryDocumentSnapshot>> snapshot) {
+          if (snapshot.connectionState == ConnectionState.waiting) { return const Text("Loading..."); }
+          if (snapshot.hasError) {return Text('Error: ${snapshot.error}');}
+          List<QueryDocumentSnapshot> documents = snapshot.data!;
+          return ListView.builder(
+            itemCount: documents.length,
+            itemBuilder: (BuildContext context, int index) {
+              var name = documents[index].get('senderName');
+              var requestSender = documents[index].get('senderUid');
+              var isAccepted = documents[index].get('isAccepted');
+              var senderImageUrl = documents[index].get('senderImageUrl');
+              return RequestCard(name: name, requestSender: requestSender, isAccepted: isAccepted, senderImageUrl: senderImageUrl);
+            },
+          );
+        },
+      ),
     );
   }
 }
