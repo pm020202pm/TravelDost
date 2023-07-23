@@ -1,14 +1,14 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:transport/Components/Image_card.dart';
-import 'package:transport/Components/button.dart';
-import 'package:transport/Components/custom_textfield.dart';
-import 'package:transport/Components/scrollable_list.dart';
-import 'package:transport/Components/top_bar.dart';
+import 'package:TravelDost/Components/Image_card.dart';
+import 'package:TravelDost/Components/button.dart';
+import 'package:TravelDost/Components/custom_textfield.dart';
+import 'package:TravelDost/Components/scrollable_list.dart';
+import 'package:TravelDost/Components/top_bar.dart';
 import '../Components/home_item_list.dart';
 import '../constants.dart';
 import '../pages/home_page.dart';
-import 'package:intl/intl.dart';
 
 class MyRequestCard extends StatefulWidget {
   MyRequestCard({Key? key}) : super(key: key);
@@ -18,12 +18,9 @@ class MyRequestCard extends StatefulWidget {
 
 class _MyRequestCardState extends State<MyRequestCard> {
   String name = '';
-  String time = '';
-  String date = '';
+  String time = ''; String date = '';
   String imageUrl = '';
-  String fromPlace = '';
-  String toPlace = '';
-  String vehicle = '';
+  String fromPlace = ''; String vehicle = ''; String toPlace = '';
   bool isDeleted=false;
   String? _selectedItem='Auto';
   late String deleteID;
@@ -32,19 +29,13 @@ class _MyRequestCardState extends State<MyRequestCard> {
   final TextEditingController toController = TextEditingController();
   final TextEditingController detailsController = TextEditingController();
   DateTime selectedDate = DateTime.now();
+
   @override
   void initState() {
     getDocumentIdByFieldValue();
     super.initState();
   }
 
-  String formatDateWithMonthInWords(DateTime date) {
-    final formatter = DateFormat('dd MMM');
-    return formatter.format(date);
-  }
-
-
-  /////TO DELETE A REQUEST
   Future<void> deleteCard(String documentId) async {
     FirebaseFirestore.instance.collection('Users').doc(documentId).delete().then((value) {
       print('CARD DELETED SUCCESSFULLY');
@@ -76,13 +67,6 @@ class _MyRequestCardState extends State<MyRequestCard> {
           vehicle = doc.get('mode');
           deleteID = doc.id;
         });
-        // print(name);
-        // print(time);
-        // print(date);
-        // print(fromPlace);
-        // print(toPlace);
-        // print(vehicle);
-        // print(deleteID);
       }
       else {
         print('Document with ID does not exist.');
@@ -110,7 +94,8 @@ class _MyRequestCardState extends State<MyRequestCard> {
     toController.clear();
     detailsController.clear();
     getDocumentIdByFieldValue();
-    Navigator.pushReplacement(context, MaterialPageRoute(builder: (context)=> MyHomePage()));
+    Navigator.pushReplacementNamed(context, '/homepage');
+    // Navigator.pushReplacementNamed(context, '');
   }
 
   @override
@@ -141,339 +126,336 @@ class _MyRequestCardState extends State<MyRequestCard> {
                           borderRadius: BorderRadius.circular(20)
                       ),
                       duration: Duration(milliseconds: (isMyCardExpanded)? 300:10),
-                      child: SingleChildScrollView(
-                        child: (name == '')
-                            ? SizedBox(
-                          width: 0.9*screenSize.width,
-                          child: (isMyCardExpanded==false)
-                              ? InkWell(
-                            onTap: () {
-                              setState(() {
-                                isMyCardExpanded = true;
-                              });
-                              print('$isMyCardExpanded');
-                            },
-                            child: Container(
-                              alignment: Alignment.center,
-                              width: 0.9*screenSize.width,
-                              height: 55,
-                              child: const Column(
-                                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                                children: [
-                                  Icon(Icons.add),
-                                  Text('Create a new request')
-                                ],
-                              ),
+                      child: (name == '')
+                          ? SizedBox(
+                        width: 0.9*screenSize.width,
+                        child: (isMyCardExpanded==false)
+                            ? InkWell(
+                          onTap: () {
+                            setState(() {
+                              isMyCardExpanded = true;
+                            });
+                            print('$isMyCardExpanded');
+                          },
+                          child: Container(
+                            alignment: Alignment.center,
+                            width: 0.9*screenSize.width,
+                            height: 55,
+                            child: const Column(
+                              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                              children: [
+                                Icon(Icons.add),
+                                Text('Create a new request')
+                              ],
                             ),
-                          )
-                              : Padding(
-                            padding: const EdgeInsets.all(8.0),
-                            child: Container(
-                              height: screenSize.height*0.38,
-                              child: Column(
-                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                children: [
-                                  Row(
-                                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                    children: [
-                                      ////SET TIME WIDGET
-                                      Container(
-                                        height: 96,
-                                        width: 0.9*screenSize.width-110,
-                                        decoration: BoxDecoration(
-                                            borderRadius: BorderRadius.circular(15),
-                                            color: Colors.grey[300]
-                                        ),
-                                        child: Stack(
-                                          alignment: Alignment.center,
-                                          children: [
-                                            Opacity(
-                                              opacity: .5,
-                                              child: Container(
-                                                height: 32,
-                                                width: 0.9*screenSize.width-135,
-                                                decoration: BoxDecoration(
-                                                    color: Colors.grey[500],
-                                                    borderRadius: BorderRadius.circular(50)
-                                                ),
-                                              ),
-                                            ),
-                                            SizedBox(
-                                              height: 71,
-                                              width: 180,
-                                              child: Row(
-                                                mainAxisAlignment: MainAxisAlignment.center,
-                                                children: [
-                                                  ScrollHour(),
-                                                  const SizedBox(width: 20, child: Text(' :', style: TextStyle(fontSize: 24),),),
-                                                  ScrollMinute(),
-                                                  const SizedBox(width: 8,),
-                                                  ScrollPmAm(),
-                                                ],
-                                              ),
-                                            ),
-                                          ],
-                                        ),
+                          ),
+                        )
+                            : Padding(
+                          padding: const EdgeInsets.all(8.0),
+                          child: SingleChildScrollView(
+                            child: Column(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                                Row(
+                                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                  children: [
+                                    ////SET TIME WIDGET
+                                    Container(
+                                      height: 96,
+                                      width: 0.9*screenSize.width-110,
+                                      decoration: BoxDecoration(
+                                          borderRadius: BorderRadius.circular(15),
+                                          color: Colors.grey[300]
                                       ),
-                                      ////SET VEHICLE WIDGET
-                                      Stack(
-                                        alignment: Alignment.topCenter,
+                                      child: Stack(
+                                        alignment: Alignment.center,
                                         children: [
-                                          Container(
-                                            alignment: Alignment.center,
-                                            height: 96,
-                                            width: 85,
-                                            decoration: BoxDecoration(
-                                                borderRadius: BorderRadius.circular(15),
-                                                color: Colors.grey[300]
+                                          Opacity(
+                                            opacity: .5,
+                                            child: Container(
+                                              height: 32,
+                                              width: 0.9*screenSize.width-135,
+                                              decoration: BoxDecoration(
+                                                  color: Colors.grey[500],
+                                                  borderRadius: BorderRadius.circular(50)
+                                              ),
                                             ),
-                                            child:Column(
-                                              mainAxisAlignment: MainAxisAlignment.spaceAround,
+                                          ),
+                                          SizedBox(
+                                            height: 71,
+                                            width: 180,
+                                            child: Row(
+                                              mainAxisAlignment: MainAxisAlignment.center,
                                               children: [
-                                                Container(
-                                                    alignment: Alignment.center,
-                                                    width: 70,
-                                                    height: 20,
-                                                    decoration: BoxDecoration(
-                                                      color: Colors.grey[400],
-                                                      borderRadius: BorderRadius.circular(20),
-                                                    ),
-                                                    child: const Text('Travel mode', style: TextStyle(fontSize: 11),)
-                                                ),
-                                                DropdownButton<String>(
-                                                  borderRadius: BorderRadius.circular(20),
-                                                  iconSize: 0,
-                                                  dropdownColor: Colors.grey[100],
-                                                  value: _selectedItem,
-                                                  elevation: 1,
-                                                  onChanged: (String? newValue) {
-                                                    setState(() {
-                                                      _selectedItem = newValue;
-                                                    });
-                                                    print(_selectedItem);
-                                                  },
-                                                  items: <String>['Auto', 'Bus', 'Car', 'Train', 'Flight'].map((String value) {
-                                                    return DropdownMenuItem<String>(
-                                                      value: value,
-                                                      child: Container(
-                                                          height: 50,
-                                                          width: 70,
-                                                          decoration: BoxDecoration(
-                                                            borderRadius: BorderRadius.circular(10),
-                                                            color: Colors.grey[200],
-                                                          ),
-                                                          child: Image.asset('assets/$value.png')
-                                                      ),
-                                                    );
-                                                  }).toList(),
-                                                ),
+                                                ScrollHour(),
+                                                const SizedBox(width: 20, child: Text(' :', style: TextStyle(fontSize: 24),),),
+                                                ScrollMinute(),
+                                                const SizedBox(width: 8,),
+                                                ScrollPmAm(),
                                               ],
                                             ),
                                           ),
                                         ],
-                                      )
-                                    ],
-                                  ),
-                                  const SizedBox(height: 20,),
-                                  Row(
-                                    children: [
-                                      Expanded(child: CustomTextField(controller: fromController, obscureText: false, boxHeight: 35, hintText: 'From Place',)),
-                                      const SizedBox(width: 10,),
-                                      Expanded(child: CustomTextField(controller: toController, obscureText: false, boxHeight: 35, hintText: 'To Place',)),
-                                      SizedBox(
-                                        height: 35,
-                                        child: Stack(
-                                          alignment: Alignment.topCenter,
-                                          children: [
-                                            IconButton(
-                                              padding: EdgeInsets.zero,
-                                              onPressed: () async {
-                                                DateTime? pickedDate = await showDatePicker(
-                                                  context: context,
-                                                  initialDate: selectedDate,
-                                                  firstDate: DateTime(DateTime.now().year, DateTime.now().month, DateTime.now().day),
-                                                  lastDate: DateTime(DateTime.now().year+1),
-                                                );
-                                                if (pickedDate != null && pickedDate != selectedDate) {
-                                                  setState(() {
-                                                    selectedDate = pickedDate;
-                                                  });
-                                                }
-                                              },
-                                              icon: const Icon(Icons.date_range_rounded, color: Colors.blue, size: 35,),
-                                            ),
-                                            Column(
-                                              children: [
-                                                const SizedBox(height: 13,),
-                                                Container(
-                                                  alignment: Alignment.center,
-                                                  height: 13,
-                                                  width: 15,
-                                                  color: Colors.grey[200],
-                                                    child: Text('${selectedDate.day}' , style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w800, color: Colors.blue),)),
-                                              ],
-                                            ),
-                                          ],
-                                        ),
                                       ),
-                                    ],
-                                  ),
-                                  const SizedBox(height: 20,),
-                                  TextField(
-                                    maxLines: 1,
-                                    maxLength: 60,
-                                    controller: detailsController,
-                                    decoration: const InputDecoration(
-                                      hintText: 'Add a message (optional)',
-                                      hintStyle: TextStyle(fontSize: 13),
-                                      enabledBorder: OutlineInputBorder(
-                                        borderSide: BorderSide(color: Colors.lightBlue, width: 0,),
-                                        borderRadius: BorderRadius.all(Radius.circular(20)),
-                                      ),
-                                      focusedBorder: OutlineInputBorder(
-                                        borderSide: BorderSide(color: Colors.lightBlue, width: 1,),
-                                        borderRadius: BorderRadius.all(Radius.circular(10)),
-                                      ),
-                                      filled: true,
                                     ),
-                                  ),
-                                  const SizedBox(height: 10,),
-                                  Row(
-                                    mainAxisAlignment: MainAxisAlignment.end,
-                                    children: [
-                                      Button(
-                                        buttonText: 'Cancel' ,
-                                        textColor: Colors.red,
-                                        buttonBgColor: Colors.red[100],
-                                        onPressed: () {
-                                          setState(() {
-                                            isMyCardExpanded = false;
-                                          });
-                                        },
-                                        height: 32, width: 80, borderRadius: 15,
-                                        splashColor: Colors.red[200],
-                                      ),
-                                      const SizedBox(width: 10,),
-                                      Button(
-                                        buttonText: 'Create',
-                                        textColor: Colors.green[900],
-                                        buttonBgColor: Colors.green[100],
-                                        onPressed: ()  async {
-                                          await submitDetails();
-                                          setState(() {
-                                            isMyCardExpanded=false;
-                                          });
-                                        },
-                                        height: 32, width: 70, borderRadius: 15,
-                                        splashColor: Colors.green[200],
-                                      ),
-                                    ],)
-                                ],
-                              ),
-                            ),
-                          ),
-                        )
-                            :
-                        Padding(
-                          padding: const EdgeInsets.all(8),
-                          child: Container(
-                            alignment: Alignment.center,
-                            width: screenSize.width*0.8,
-                            child: Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                              children: [
+                                    ////SET VEHICLE WIDGET
+                                    Stack(
+                                      alignment: Alignment.topCenter,
+                                      children: [
+                                        Container(
+                                          alignment: Alignment.center,
+                                          height: 96,
+                                          width: 85,
+                                          decoration: BoxDecoration(
+                                              borderRadius: BorderRadius.circular(15),
+                                              color: Colors.grey[300]
+                                          ),
+                                          child:Column(
+                                            mainAxisAlignment: MainAxisAlignment.spaceAround,
+                                            children: [
+                                              Container(
+                                                  alignment: Alignment.center,
+                                                  width: 70,
+                                                  height: 20,
+                                                  decoration: BoxDecoration(
+                                                    color: Colors.grey[400],
+                                                    borderRadius: BorderRadius.circular(20),
+                                                  ),
+                                                  child: const Text('Travel mode', style: TextStyle(fontSize: 11),)
+                                              ),
+                                              DropdownButton<String>(
+                                                borderRadius: BorderRadius.circular(20),
+                                                iconSize: 0,
+                                                dropdownColor: Colors.grey[100],
+                                                value: _selectedItem,
+                                                elevation: 1,
+                                                onChanged: (String? newValue) {
+                                                  setState(() {
+                                                    _selectedItem = newValue;
+                                                  });
+                                                  print(_selectedItem);
+                                                },
+                                                items: <String>['Auto', 'Bus', 'Car', 'Train', 'Flight'].map((String value) {
+                                                  return DropdownMenuItem<String>(
+                                                    value: value,
+                                                    child: Container(
+                                                        height: 50,
+                                                        width: 70,
+                                                        decoration: BoxDecoration(
+                                                          borderRadius: BorderRadius.circular(10),
+                                                          color: Colors.grey[200],
+                                                        ),
+                                                        child: Image.asset('assets/$value.png')
+                                                    ),
+                                                  );
+                                                }).toList(),
+                                              ),
+                                            ],
+                                          ),
+                                        ),
+                                      ],
+                                    )
+                                  ],
+                                ),
+                                const SizedBox(height: 20,),
                                 Row(
                                   children: [
-                                    ImageCard(height: 44, width: 44, radius: 13, imageProvider: NetworkImage(userImageUrl),),
-                                    const SizedBox(width: 13,),
+                                    Expanded(child: CustomTextField(controller: fromController, obscureText: false, boxHeight: 35, hintText: 'From Place',)),
+                                    const SizedBox(width: 10,),
+                                    Expanded(child: CustomTextField(controller: toController, obscureText: false, boxHeight: 35, hintText: 'To Place',)),
                                     SizedBox(
-                                      width: screenSize.width*0.533,
-                                      child: Column(
-                                        crossAxisAlignment: CrossAxisAlignment.start,
+                                      height: 35,
+                                      child: Stack(
+                                        alignment: Alignment.topCenter,
                                         children: [
-                                          const SizedBox(height: 4,),
-                                          Text('Leaving at $time on $date', style: const TextStyle(fontSize: 12),),
-                                          Row(children: [
-                                            Text(fromPlace.toUpperCase(), style: TextStyle(fontSize: 11, color: Colors.grey[600], fontWeight: FontWeight.w500),),
-                                            const SizedBox(width: 5,),
-                                            const Icon(Icons.linear_scale, color: Colors.grey),
-                                            const SizedBox(width: 5,),
-                                            Image.asset('assets/$vehicle.png', height: 16,),
-                                            const SizedBox(width: 5,),
-                                            const Icon(Icons.linear_scale, color: Colors.grey),
-                                            const SizedBox(width: 5,),
-                                            Text(toPlace.toUpperCase(), style: TextStyle(fontSize: 11, color: Colors.grey[600], fontWeight: FontWeight.w500),),
-                                          ],),
+                                          IconButton(
+                                            padding: EdgeInsets.zero,
+                                            onPressed: () async {
+                                              DateTime? pickedDate = await showDatePicker(
+                                                context: context,
+                                                initialDate: selectedDate,
+                                                firstDate: DateTime(DateTime.now().year, DateTime.now().month, DateTime.now().day),
+                                                lastDate: DateTime(DateTime.now().year+1),
+                                              );
+                                              if (pickedDate != null && pickedDate != selectedDate) {
+                                                setState(() {
+                                                  selectedDate = pickedDate;
+                                                });
+                                              }
+                                            },
+                                            icon: const Icon(Icons.date_range_rounded, color: Colors.blue, size: 35,),
+                                          ),
+                                          Column(
+                                            children: [
+                                              const SizedBox(height: 13,),
+                                              Container(
+                                                alignment: Alignment.center,
+                                                height: 13,
+                                                width: 15,
+                                                color: Colors.grey[200],
+                                                  child: Text('${selectedDate.day}' , style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w800, color: Colors.blue),)),
+                                            ],
+                                          ),
                                         ],
                                       ),
                                     ),
                                   ],
                                 ),
-                                Container(
-                                  alignment: Alignment.center,
-                                  height: 44,
-                                  width: 44,
-                                  decoration: BoxDecoration(
-                                    borderRadius: BorderRadius.circular(13),
-                                    color: Colors.red[100],
-                                  ),
-                                  child: IconButton(
-                                    padding: EdgeInsets.zero,
-                                    alignment: Alignment.center,
-                                    icon: Icon(Icons.delete_forever_outlined, color: Colors.red[800],),
-                                    onPressed: () { deleteCard(deleteID);
-                                    setState(() {
-                                      name='';
-                                    }); },
+                                const SizedBox(height: 20,),
+                                TextField(
+                                  maxLines: 1,
+                                  maxLength: 60,
+                                  controller: detailsController,
+                                  decoration: const InputDecoration(
+                                    hintText: 'Add a message (optional)',
+                                    hintStyle: TextStyle(fontSize: 13),
+                                    enabledBorder: OutlineInputBorder(
+                                      borderSide: BorderSide(color: Colors.lightBlue, width: 0,),
+                                      borderRadius: BorderRadius.all(Radius.circular(20)),
+                                    ),
+                                    focusedBorder: OutlineInputBorder(
+                                      borderSide: BorderSide(color: Colors.lightBlue, width: 1,),
+                                      borderRadius: BorderRadius.all(Radius.circular(10)),
+                                    ),
+                                    filled: true,
                                   ),
                                 ),
-                                // Row(
-                                //   mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                //   children: [
-                                //     Container(
-                                //       height: 50,
-                                //       color: Colors.blue,
-                                //       width: screenSize.width*0.533,
-                                //       child: Column(
-                                //         crossAxisAlignment: CrossAxisAlignment.start,
-                                //         children: [
-                                //           const SizedBox(height: 4,),
-                                //           Text('Leaving at $time on $date', style: const TextStyle(fontSize: 12),),
-                                //           Row(children: [
-                                //             Text(fromPlace.toUpperCase(), style: TextStyle(fontSize: 11, color: Colors.grey[600], fontWeight: FontWeight.w500),),
-                                //             const SizedBox(width: 5,),
-                                //             const Icon(Icons.linear_scale, color: Colors.grey),
-                                //             const SizedBox(width: 5,),
-                                //             Image.asset('assets/$vehicle.png', height: 16,),
-                                //             const SizedBox(width: 5,),
-                                //             const Icon(Icons.linear_scale, color: Colors.grey),
-                                //             const SizedBox(width: 5,),
-                                //             Text(toPlace.toUpperCase(), style: TextStyle(fontSize: 11, color: Colors.grey[600], fontWeight: FontWeight.w500),),
-                                //           ],),
-                                //         ],
-                                //       ),
-                                //     ),
-                                //     Container(
-                                //       alignment: Alignment.center,
-                                //       height: 44,
-                                //       width: 44,
-                                //       decoration: BoxDecoration(
-                                //         borderRadius: BorderRadius.circular(13),
-                                //         color: Colors.red[100],
-                                //       ),
-                                //       child: IconButton(
-                                //         padding: EdgeInsets.zero,
-                                //         alignment: Alignment.center,
-                                //         icon: Icon(Icons.delete_forever_outlined, color: Colors.red[800],),
-                                //         onPressed: () { deleteCard(deleteID);
-                                //         setState(() {
-                                //           name='';
-                                //         }); },
-                                //       ),
-                                //     )
-                                // ]),
+                                const SizedBox(height: 10,),
+                                Row(
+                                  mainAxisAlignment: MainAxisAlignment.end,
+                                  children: [
+                                    Button(
+                                      buttonText: 'Cancel' ,
+                                      textColor: Colors.red,
+                                      buttonBgColor: Colors.red[100],
+                                      onPressed: () {
+                                        setState(() {
+                                          isMyCardExpanded = false;
+                                        });
+                                      },
+                                      height: 32, width: 80, borderRadius: 15,
+                                      splashColor: Colors.red[200],
+                                    ),
+                                    const SizedBox(width: 10,),
+                                    Button(
+                                      buttonText: 'Create',
+                                      textColor: Colors.green[900],
+                                      buttonBgColor: Colors.green[100],
+                                      onPressed: ()  async {
+                                        await submitDetails();
+                                        setState(() {
+                                          isMyCardExpanded=false;
+                                        });
+                                      },
+                                      height: 32, width: 70, borderRadius: 15,
+                                      splashColor: Colors.green[200],
+                                    ),
+                                  ],)
                               ],
                             ),
+                          ),
+                        ),
+                      )
+                          :
+                      Padding(
+                        padding: const EdgeInsets.all(8),
+                        child: Container(
+                          alignment: Alignment.center,
+                          width: screenSize.width*0.8,
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              Row(
+                                children: [
+                                  ImageCard(height: 44, width: 44, radius: 13, imageProvider: NetworkImage(userImageUrl),),
+                                  const SizedBox(width: 13,),
+                                  SizedBox(
+                                    width: screenSize.width*0.533,
+                                    child: Column(
+                                      crossAxisAlignment: CrossAxisAlignment.start,
+                                      children: [
+                                        const SizedBox(height: 4,),
+                                        Text('Leaving at $time on $date', style: const TextStyle(fontSize: 12),),
+                                        Row(children: [
+                                          Text(fromPlace.toUpperCase(), style: TextStyle(fontSize: 11, color: Colors.grey[600], fontWeight: FontWeight.w500),),
+                                          const SizedBox(width: 5,),
+                                          const Icon(Icons.linear_scale, color: Colors.grey),
+                                          const SizedBox(width: 5,),
+                                          Image.asset('assets/$vehicle.png', height: 16,),
+                                          const SizedBox(width: 5,),
+                                          const Icon(Icons.linear_scale, color: Colors.grey),
+                                          const SizedBox(width: 5,),
+                                          Text(toPlace.toUpperCase(), style: TextStyle(fontSize: 11, color: Colors.grey[600], fontWeight: FontWeight.w500),),
+                                        ],),
+                                      ],
+                                    ),
+                                  ),
+                                ],
+                              ),
+                              Container(
+                                alignment: Alignment.center,
+                                height: 44,
+                                width: 44,
+                                decoration: BoxDecoration(
+                                  borderRadius: BorderRadius.circular(13),
+                                  color: Colors.red[100],
+                                ),
+                                child: IconButton(
+                                  padding: EdgeInsets.zero,
+                                  alignment: Alignment.center,
+                                  icon: Icon(Icons.delete_forever_outlined, color: Colors.red[800],),
+                                  onPressed: () { deleteCard(deleteID);
+                                  setState(() {
+                                    name='';
+                                  }); },
+                                ),
+                              ),
+                              // Row(
+                              //   mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              //   children: [
+                              //     Container(
+                              //       height: 50,
+                              //       color: Colors.blue,
+                              //       width: screenSize.width*0.533,
+                              //       child: Column(
+                              //         crossAxisAlignment: CrossAxisAlignment.start,
+                              //         children: [
+                              //           const SizedBox(height: 4,),
+                              //           Text('Leaving at $time on $date', style: const TextStyle(fontSize: 12),),
+                              //           Row(children: [
+                              //             Text(fromPlace.toUpperCase(), style: TextStyle(fontSize: 11, color: Colors.grey[600], fontWeight: FontWeight.w500),),
+                              //             const SizedBox(width: 5,),
+                              //             const Icon(Icons.linear_scale, color: Colors.grey),
+                              //             const SizedBox(width: 5,),
+                              //             Image.asset('assets/$vehicle.png', height: 16,),
+                              //             const SizedBox(width: 5,),
+                              //             const Icon(Icons.linear_scale, color: Colors.grey),
+                              //             const SizedBox(width: 5,),
+                              //             Text(toPlace.toUpperCase(), style: TextStyle(fontSize: 11, color: Colors.grey[600], fontWeight: FontWeight.w500),),
+                              //           ],),
+                              //         ],
+                              //       ),
+                              //     ),
+                              //     Container(
+                              //       alignment: Alignment.center,
+                              //       height: 44,
+                              //       width: 44,
+                              //       decoration: BoxDecoration(
+                              //         borderRadius: BorderRadius.circular(13),
+                              //         color: Colors.red[100],
+                              //       ),
+                              //       child: IconButton(
+                              //         padding: EdgeInsets.zero,
+                              //         alignment: Alignment.center,
+                              //         icon: Icon(Icons.delete_forever_outlined, color: Colors.red[800],),
+                              //         onPressed: () { deleteCard(deleteID);
+                              //         setState(() {
+                              //           name='';
+                              //         }); },
+                              //       ),
+                              //     )
+                              // ]),
+                            ],
                           ),
                         ),
                       ),

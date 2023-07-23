@@ -1,7 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:transport/Components/custom_textfield.dart';
+import 'package:TravelDost/Components/custom_textfield.dart';
 import '../Components/button.dart';
 import '../constants.dart';
 import 'home_page.dart';
@@ -17,8 +17,10 @@ class _LoginPageState extends State<LoginPage> {
   final TextEditingController emailController = TextEditingController();
   final TextEditingController passwordController = TextEditingController();
 
-  /////GET USER IMAGE URL
-
+  @override
+  void initState() {
+    super.initState();
+  }
 
   /////SIGN IN WITH EMAIL AND PASSWORD
   void signInWithEmailAndPassword(String email, String password) async {
@@ -43,11 +45,10 @@ class _LoginPageState extends State<LoginPage> {
           }
           else {}
         }
-        else{}
+        mapAndSendFCM();
         print('USER UID IS : $userUid');
         print('USER NAME IS : $userName');
         print('USER Image IS : $userImageUrl');
-        // await getUserImageUrlAndName();
         if(await duplicates()){
           setState(() {
             myList=true;

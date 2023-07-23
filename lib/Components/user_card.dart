@@ -1,11 +1,11 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
-import 'package:transport/Components/Image_card.dart';
+import 'package:TravelDost/Components/Image_card.dart';
 import '../constants.dart';
 import 'button.dart';
 
 class UserCard extends StatefulWidget {
-  UserCard({Key? key, required this.name, required this.time, required this.isRequested, required this.imageUrl, required this.cardUid, required this.otherFCM, required this.isAccepted, required this.isDenied, required this.vehicle, required this.fromPlace, required this.toPlace, required this.message, required this.isMessage}) : super(key: key);
+  UserCard({Key? key, required this.name, required this.time, required this.isRequested, required this.imageUrl, required this.cardUid, required this.isAccepted, required this.isDenied, required this.vehicle, required this.fromPlace, required this.toPlace, required this.message, required this.isMessage}) : super(key: key);
 
   final String name;
   final String time;
@@ -17,12 +17,13 @@ class UserCard extends StatefulWidget {
   final String cardUid;
   final String message;
   final bool isMessage;
-  late final String otherFCM;
+  // late final String otherFCM;
   @override
   State<UserCard> createState() => _UserCardState();
 }
 
 class _UserCardState extends State<UserCard> {
+  late final String otherFCM;
   bool isExpanded=false;
   late String senderName;
   late String receiverName;
@@ -47,44 +48,63 @@ class _UserCardState extends State<UserCard> {
     }
   }
 
-  // void congratulationDialog(){
-  //   showDialog(
-  //     context: context,
-  //     builder: (BuildContext context) {
-  //       return AlertDialog(
-  //         content: SizedBox(
-  //           height: 120,
-  //           width: 150,
-  //           child: Column(
-  //             children: [
-  //               Image.asset('assets/check.png', height: 75,),
-  //               const SizedBox(height: 20,),
-  //               const Text('Request sent successfully !')
-  //             ],
-  //           ),
-  //         ),
-  //       );
-  //     },
-  //   );
-  // }
-
-  Future<void> getSenderName() async {
-    QuerySnapshot snapshot = await firestore.collection('register').where('uid', isEqualTo: userUid).get();
-    if (snapshot.size > 0) {
-      DocumentSnapshot doc = await firestore.collection('register').doc(snapshot.docs[0].id).get();
-      if (doc.exists) {
+  Future<String> getFCMByUid() async {
+    try {
+      var querySnapshot = await FirebaseFirestore.instance.collection('fcm').where('uid', isEqualTo: widget.cardUid).limit(1).get();
+      if (querySnapshot.docs.isNotEmpty) {
+        var userDocument = querySnapshot.docs.first;
+        var getFcm = userDocument.data()['token'];
         setState(() {
-          senderName= doc.get('name');
+          otherFCM=getFcm;
         });
+        print(otherFCM);
+        return getFcm;
+      } else {
+        return ' ';
       }
-      else {
-        print('SENDER NAME NOT FOUND');
-      }
-    }
-    else {
-      print('NO DOC IN REGISTER FOUND!');
+    } catch (e) {
+      print('Error getting username: $e');
+      return ' ';
     }
   }
+
+
+  // Future<void> getFCMByUid() async {
+  //   print(widget.cardUid);
+  //   QuerySnapshot snapshot = await FirebaseFirestore.instance.collection('fcm').where('uid', isEqualTo: widget.cardUid).get();
+  //   if (snapshot.size > 0) {
+  //     DocumentSnapshot doc = await FirebaseFirestore.instance.collection('fcm').doc(snapshot.docs[0].id).get();
+  //     if (doc.exists) {
+  //       setState(() {
+  //         widget.otherFCM = doc.get('token');
+  //       });
+  //       print('other user fcm is ${widget.otherFCM}');
+  //     }
+  //     else {
+  //     }
+  //   }
+  //   else {
+  //     print('no fcm found');
+  //   }
+  // }
+
+  // Future<void> getSenderName() async {
+  //   QuerySnapshot snapshot = await firestore.collection('register').where('uid', isEqualTo: userUid).get();
+  //   if (snapshot.size > 0) {
+  //     DocumentSnapshot doc = await firestore.collection('register').doc(snapshot.docs[0].id).get();
+  //     if (doc.exists) {
+  //       setState(() {
+  //         senderName= doc.get('name');
+  //       });
+  //     }
+  //     else {
+  //       print('SENDER NAME NOT FOUND');
+  //     }
+  //   }
+  //   else {
+  //     print('NO DOC IN REGISTER FOUND!');
+  //   }
+  // }
 
   Future<void> sendRequest() async {
     QuerySnapshot requestQuerySnapshot = await firestore.collection('requests').where('senderUid', isEqualTo: userUid).where('receiverUid', isEqualTo: widget.cardUid).limit(1).get();
@@ -93,7 +113,8 @@ class _UserCardState extends State<UserCard> {
     }
     else {
       await firestore.collection('requests').add({
-        'senderName': senderName,
+        // 'senderName': senderName,
+        'senderName': userName,
         'senderUid': userUid,
         'receiverUid' : widget.cardUid,
         'time' : widget.time,
@@ -116,9 +137,16 @@ class _UserCardState extends State<UserCard> {
         'isDenied' : false,
       }).then((value) => print("PENDING CARD CREATED SUCCESSFULLY")).catchError((error) => print("PENDING CREATION FAILED: $error"));
     }
+    sendNotification(
+        '$userName is requesting',
+        'to travel with you',
+        otherFCM,
+        userImageUrl
+    );
     setState(() {
       isRequestedLocal=true;
     });
+
     print('isRequested : ${widget.isRequested}');
     print('isRequestedLocal : $isRequestedLocal');
   }
@@ -221,7 +249,13 @@ class _UserCardState extends State<UserCard> {
                                   buttonText: (widget.isRequested || isRequestedLocal)? 'Requested' : 'Request',
                                   textColor: (widget.isRequested || isRequestedLocal)? Colors.grey[700]: Colors.blue,
                                   buttonBgColor:(widget.isRequested || isRequestedLocal)? Colors.grey[350] : Colors.blue[100],
-                                  onPressed: () async {if(widget.isRequested==false){await getSenderName(); sendRequest();} else{}},
+                                  onPressed: () async {
+                                    if(widget.isRequested==false)
+                                    {
+                                      await getFCMByUid();
+                                      // getFCMByUid();
+                                      sendRequest();
+                                    } else{}},
                                   height: 28, width: 80, borderRadius: 15,
                                   splashColor: (widget.isRequested || isRequestedLocal)? Colors.grey[350] : Colors.blue[200],
                                 ),

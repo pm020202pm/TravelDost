@@ -1,10 +1,10 @@
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
-import 'package:transport/Components/my_request_card.dart';
-import 'package:transport/tabs/profile_tab.dart';
-import '../tabs/home_tab.dart';
+import 'package:TravelDost/Components/my_request_card.dart';
+import 'package:TravelDost/tabs/profile_tab.dart';
+import '../constants.dart';
 import '../tabs/pending_tab.dart';
 import '../tabs/request_tab.dart';
-import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 
 class MyHomePage extends StatefulWidget {
   const MyHomePage({super.key});
@@ -14,6 +14,14 @@ class MyHomePage extends StatefulWidget {
 
 class _MyHomePageState extends State<MyHomePage> {
   int index = 0;
+
+  @override
+  void initState() {
+    super.initState();
+    requestPermission();
+    // mapAndSendFCM();
+  }
+
 
   final screens = [
     MyRequestCard(),

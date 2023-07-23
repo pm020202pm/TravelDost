@@ -1,45 +1,25 @@
+import 'dart:convert';
+import 'package:firebase_messaging/firebase_messaging.dart';
+import 'package:http/http.dart' as http;
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:intl/intl.dart';
 late String userUid;
 late String userName;
 late String userImageUrl;
 bool myList=false;
 bool isMyCardExpanded = false;
-final List<String> hours = [
-  '1',
-  '2',
-  '3',
-  '4',
-  '5',
-  '6',
-  '7',
-  '8',
-  '9',
-  '10',
-  '11',
-  '12'
-];
-final List<String> minutes = [
-  '00',
-  '05',
-  '10',
-  '15',
-  '20',
-  '25',
-  '30',
-  '35',
-  '40',
-  '45',
-  '50',
-  '55',
-];
-final List<String> pmam = [
-  'AM',
-  'PM',
-];
+final List<String> hours = ['1', '2', '3', '4', '5', '6', '7', '8', '9', '10', '11', '12'];
+final List<String> minutes = ['00', '05', '10', '15', '20', '25', '30', '35', '40', '45', '50', '55',];
+final List<String> pmam = ['AM', 'PM',];
 int selectedHour=0;
 int selectedMinute=0;
 int selectedPmAm=0;
 
+/////formatting date
+String formatDateWithMonthInWords(DateTime date) {
+  final formatter = DateFormat('dd MMM');
+  return formatter.format(date);
+}
 
 Future<void> getUserImageUrlAndName() async {
   QuerySnapshot snapshot = await FirebaseFirestore.instance.collection('register').where('uid', isEqualTo: userUid).get();
@@ -62,7 +42,6 @@ Future<void> getUserImageUrlAndName() async {
     DocumentSnapshot doc = await FirebaseFirestore.instance.collection('register').doc(snapshot.docs[0].id).get();
     if (doc.exists) {
       return doc.get('imageUrl');
-      return doc.get('imageUrl');
     }
     else {
       return ' ';
@@ -84,50 +63,121 @@ Future<bool> duplicates() async {
   }
 }
 
-////RETRIEVING DATA OF DOCUMENT EXCEPT USER's DOCUMENT
-
-
 
   /////TO MAP USERUID AND FCM AND STORE IN COLLECTION
-  // Future<void> mapAndSendFCM() async {
-  //   await FirebaseMessaging.instance.requestPermission();
-  //   final fcm = await FirebaseMessaging.instance.getToken();
-  //   print('FCM----KEY----IS----: $fcm');
-  //   await FirebaseFirestore.instance.collection('fcm').add({
-  //     'uid': userUid,
-  //     'token': fcm,
-  //   }).then((value) => print("fcm and uid added")).catchError((error) => print("Failed to fcm and uid: $error"));
-  // }
+  Future<void> mapAndSendFCM() async {
+    final fcm = await FirebaseMessaging.instance.getToken();
+    // QuerySnapshot querySnapshot = await FirebaseFirestore.instance.collection('fcm').where('uid', isEqualTo: userUid).where('token', isEqualTo: fcm).limit(1).get();
+    QuerySnapshot querySnapshot = await FirebaseFirestore.instance.collection('fcm').where('uid', isEqualTo: userUid).limit(1).get();
+    if (querySnapshot.docs.isNotEmpty) {
+      DocumentReference documentReference = querySnapshot.docs.first.reference;
+      await documentReference.update({
+        'token': fcm,
+      });
+      print('FCM UPDATED');
+    }
+    else {
+      await FirebaseFirestore.instance.collection('fcm').add({
+        'uid': userUid,
+        'token': fcm,
+      }).then((value) => print("fcm and uid added")).catchError((error) => print("Failed to fcm and uid: $error"));
+    }
+  }
+
+  ///////request permission for notification
+  void requestPermission() async{
+  FirebaseMessaging messaging = FirebaseMessaging.instance;
+  NotificationSettings settings = await messaging.requestPermission(
+    alert: true,
+    announcement: true,
+    badge: true,
+    carPlay: false,
+    criticalAlert: false,
+    provisional: false,
+    sound: true,
+  );
+  if(settings.authorizationStatus == AuthorizationStatus.authorized){
+    print("user granted permission");
+  } else if(settings.authorizationStatus==AuthorizationStatus.provisional){
+    print('user granted provisional permission');
+  } else{
+    print('user declined permission');
+  }
+}
+
+  //////send notification body
+  sendNotification(String title, body, to, icon) async {
+  try {
+    await http.post(
+      Uri.parse('https://fcm.googleapis.com/fcm/send'),
+      headers: <String, String>{
+        "Content-Type": "application/json",
+        "Authorization": "key=AAAAFzcSkuA:APA91bEbiWfeD-bGp0qbBZ5oMF5IJyOKICMKJ4mGN1Gt-QBA7o3gQwQ1PhqvrC-pTO99_J_FQ4XiWjIYb1CSoj5NSJC10EenUMYKh4xnd09K1KE3S1CjEJJRBFecOq-0UxliqUAtEQ0l",
+      },
+      body: jsonEncode(
+        <String, dynamic>{
+          'priority': 'high',
+          "to": to,
+          "notification": <String, dynamic>{
+            "title": title,
+            "body": body,
+            "android_channel_id": "basic",
+            'image': icon,
+          },
+          "data": <String, dynamic>{
+            'click_action': 'FLUTTER_NOTIFICATION_CLICK',
+            'status': 'done',
+            'body': body,
+            'title': title,
+            'image': icon,
+            "url": icon,
+          }
+        },
+      ),
+    );
+  } on Exception catch (e) {
+    print(e);
+  }
+}
+
 
 
 /////FUNCTION TO SEND PUSH NOTIFICATION(not working)
 // Future<void> sendPushNotificationToUser(String userFCMToken) async {
-//   final url = Uri.parse('https://fcm.googleapis.com/fcm/send');
-//   const serverKey = 'AAAAFzcSkuA:APA91bEbiWfeD-bGp0qbBZ5oMF5IJyOKICMKJ4mGN1Gt-QBA7o3gQwQ1PhqvrC-pTO99_J_FQ4XiWjIYb1CSoj5NSJC10EenUMYKh4xnd09K1KE3S1CjEJJRBFecOq-0UxliqUAtEQ0l';
-//   final headers = {
-//     'Content-Type': 'application/json',
-//     'Authorization': 'key=$serverKey',
-//   };
-//   print("YOUR FCM TOKENNNNNNNNNNNNNNNNNNNNNNN IS   : $userFCMToken");
-//   final bodyData = {
-//     'to': userFCMToken,
-//     'notification': {
-//       'title': 'New Request',
-//       'body': 'Someone has requested to travel with you',
-//     },
-//   };
-//   final response = await http.post(
-//     url,
-//     headers: headers,
-//     body: json.encode(bodyData),
-//   );
-//   if (response.statusCode == 200) {
-//     print('Push notification sent successfully.');
-//   }
-//   else {
-//     print('Failed to send push notification. Error: ${response.statusCode}');
+//   try {
+//     await http.post(
+//         Uri.parse('https://fcm.googleapis.com/fcm/send'),
+//         headers : <String, String>  {
+//           'Content-Type': 'application/json',
+//           'Authorization': 'key=AAAAFzcSkuA:APA91bEbiWfeD-bGp0qbBZ5oMF5IJyOKICMKJ4mGN1Gt-QBA7o3gQwQ1PhqvrC-pTO99_J_FQ4XiWjIYb1CSoj5NSJC10EenUMYKh4xnd09K1KE3S1CjEJJRBFecOq-0UxliqUAtEQ0l',
+//         },
+//         body : jsonEncode(
+//         <String, dynamic>{
+//           'priority' : 'high',
+//           'data' : <String, dynamic>{
+//             'click_action' : 'com.google.firebase.MESSAGING_EVENT',
+//             'status' : 'done',
+//             'body': 'Someone has requested to travel with you',
+//             'title': 'New Request',
+//           },
+//           "notification" : <String, dynamic>{
+//             "title" : 'New Request',
+//             "body" : 'Someone has requested to travel with you',
+//             "android_channel_id" : 'traveldost',
+//           },
+//           "to" : userFCMToken,
+//         },
+//         ),
+//     );
+//     print('send successfully');
+//   } catch (e) {
+//     if(kDebugMode){
+//       print('error push notification');
+//     }
 //   }
 // }
+
+
 
 
 ////FUNCTION TO MATCH TWO COMMON FIELDS AND THEN STORE THAT DOC IN ANOTHER COLLECTION
@@ -243,23 +293,7 @@ Future<bool> duplicates() async {
 // }
 
 
-// Future<void> getFCMByUid() async {
-//   QuerySnapshot snapshot = await FirebaseFirestore.instance.collection('fcm').where('uid', isEqualTo: widget.cardUid).get();
-//   if (snapshot.size > 0) {
-//     DocumentSnapshot doc = await FirebaseFirestore.instance.collection('fcm').doc(snapshot.docs[0].id).get();
-//     if (doc.exists) {
-//       setState(() {
-//         widget.otherFCM = doc.get('token');
-//       });
-//     }
-//     else {
-//       print('Document with ID does not exist.');
-//     }
-//   }
-//   else {
-//     print('no_doc');
-//   }
-// }
+
 
 
 

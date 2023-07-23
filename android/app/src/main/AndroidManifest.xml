@@ -2,7 +2,7 @@
     package="com.example.transport">
     <uses-permission android:name="android.permission.INTERNET"/>
    <application
-        android:label="transport"
+        android:label="TravelDost"
         android:name="${applicationName}"
         android:icon="@mipmap/ic_launcher">
         <activity

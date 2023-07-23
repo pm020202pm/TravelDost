@@ -1,6 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
-import 'package:transport/Components/user_card.dart';
+import 'package:TravelDost/Components/user_card.dart';
 import '../constants.dart';
 
 class HomeList extends StatelessWidget {
@@ -71,7 +71,7 @@ class HomeList extends StatelessWidget {
                       } else{
                         isMessage= true;
                       }
-                      return UserCard(name: name, time: 'Leaving at $hours : $minute $pmam on $date', isRequested: isRequested, imageUrl: imageUrl, cardUid: cardUid, otherFCM: '', isAccepted: isAccepted, isDenied: isDenied, vehicle: vehicle, fromPlace: fromPlace, toPlace: toPlace, message: message, isMessage: isMessage,);
+                      return UserCard(name: name, time: 'Leaving at $hours : $minute $pmam on $date', isRequested: isRequested, imageUrl: imageUrl, cardUid: cardUid, isAccepted: isAccepted, isDenied: isDenied, vehicle: vehicle, fromPlace: fromPlace, toPlace: toPlace, message: message, isMessage: isMessage,);
                     },
                   );
                 },

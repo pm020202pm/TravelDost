@@ -1,6 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
-import 'package:transport/Components/user_card.dart';
+import 'package:TravelDost/Components/user_card.dart';
 import '../constants.dart';
 
 class PendingTab extends StatefulWidget {
@@ -20,7 +20,7 @@ class _PendingTabState extends State<PendingTab> {
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: EdgeInsets.fromLTRB(16, 40, 16, 16),
+      padding: EdgeInsets.fromLTRB(8, 40, 8, 8),
       child: FutureBuilder<List<QueryDocumentSnapshot>>(
         future: fetchRequestsDocuments(),
         builder: (BuildContext context,
@@ -36,7 +36,7 @@ class _PendingTabState extends State<PendingTab> {
               var imageUrl = documents[index].get('imageUrl');
               var isAccepted = documents[index].get('isAccepted');
               var isDenied = documents[index].get('isDenied');
-              return UserCard(name: name, time: time, isRequested: true, imageUrl:imageUrl, cardUid: '', otherFCM: '', isAccepted: isAccepted, isDenied: isDenied, vehicle: 'Auto', fromPlace: ' ', toPlace: ' ', message: ' ', isMessage: true,);
+              return UserCard(name: name, time: time, isRequested: true, imageUrl:imageUrl, cardUid: '', isAccepted: isAccepted, isDenied: isDenied, vehicle: 'Auto', fromPlace: ' ', toPlace: ' ', message: ' ', isMessage: true,);
             },
           );
         },

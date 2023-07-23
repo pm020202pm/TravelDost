@@ -19,7 +19,7 @@ class _AcceptedTabState extends State<AcceptedTab> {
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: EdgeInsets.fromLTRB(16, 40, 16, 16),
+      padding: EdgeInsets.fromLTRB(8, 40, 8, 8),
       child: FutureBuilder<List<QueryDocumentSnapshot>>(
         future: fetchRequestsDocuments(),
         builder: (BuildContext context, AsyncSnapshot<List<QueryDocumentSnapshot>> snapshot) {

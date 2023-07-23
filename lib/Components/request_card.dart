@@ -1,7 +1,9 @@
+import 'package:TravelDost/Components/my_icon_button.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
-import 'package:transport/constants.dart';
-
+import 'package:TravelDost/constants.dart';
+import 'package:line_icons/line_icon.dart';
+import 'package:line_icons/line_icons.dart';
 import 'Image_card.dart';
 import 'button.dart';
 
@@ -66,7 +68,7 @@ class _RequestCardState extends State<RequestCard> {
   Widget build(BuildContext context) {
     Size screenSize = MediaQuery.of(context).size;
     return Padding(
-      padding: const EdgeInsets.all(10),
+      padding: EdgeInsets.all(8),
       child: Container(
           width: screenSize.width*0.9,
           height: 62,
@@ -86,9 +88,8 @@ class _RequestCardState extends State<RequestCard> {
                     Column(
                       mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                       children: [
-                        SizedBox(width: 0.3*screenSize.width,child: Text('${widget.name} is requesting', style: TextStyle(fontSize: 14, color: Colors.grey[900]),),),
-                        const SizedBox(height: 2,),
-                        SizedBox(width: 0.3*screenSize.width,child: Text('to travel with you', style: TextStyle(fontSize: 12, color: Colors.grey[700]),),),
+                        SizedBox(width: 0.3*screenSize.width,child: Text('${widget.name.toUpperCase()}', style: TextStyle(fontSize: 11, color: Colors.grey[800], fontWeight: FontWeight.w600),),),
+                        SizedBox(width: 0.3*screenSize.width,child: Text('is requesting to travel with you', style: TextStyle(fontSize: 11, color: Colors.grey[700]),),),
                       ],
                     ),
                   ],
@@ -106,23 +107,41 @@ class _RequestCardState extends State<RequestCard> {
                 : Row(
                   mainAxisAlignment: MainAxisAlignment.end,
                   children: [
-                    Button(
-                      buttonText: 'Accept',
-                      textColor: Colors.blue[900],
-                      buttonBgColor: Colors.blue[100],
-                      onPressed: ()  {acceptRequest();},
-                      height: 40, width: 70, borderRadius: 15,
-                      splashColor: Colors.blue[200],
+                    MyIconButton(
+                      buttonBgColor: Colors.red[100],
+                      iconColor: Colors.red[800],
+                      splashColor: Colors.red[200],
+                        onPressed: () {denyRequest();},
+                        iconSize: 25, height: 40, width: 50, borderRadius: 20,
+                        icon: Icons.clear
                     ),
                     const SizedBox(width: 10,),
-                    Button(
-                      buttonText: 'Deny',
-                      textColor: Colors.red[900],
-                      buttonBgColor: Colors.red[100],
-                      onPressed: ()  {denyRequest();},
-                      height: 40, width: 70, borderRadius: 15,
-                      splashColor: Colors.red[200],
+                    MyIconButton(
+                      buttonBgColor: Colors.green[100],
+                      iconColor: Colors.green[800],
+                      splashColor: Colors.green[200],
+                        onPressed: ()  {acceptRequest();},
+                        iconSize: 25, height: 40, width: 50, borderRadius: 20,
+                        icon: Icons.check,
                     ),
+
+                    // Button(
+                    //   buttonText: 'Accept',
+                    //   textColor: Colors.blue[900],
+                    //   buttonBgColor: Colors.blue[100],
+                    //   onPressed: ()  {acceptRequest();},
+                    //   height: 40, width: 70, borderRadius: 15,
+                    //   splashColor: Colors.blue[200],
+                    // ),
+                    // const SizedBox(width: 10,),
+                    // Button(
+                    //   buttonText: 'Deny',
+                    //   textColor: Colors.red[900],
+                    //   buttonBgColor: Colors.red[100],
+                    //   onPressed: ()  {denyRequest();},
+                    //   height: 40, width: 70, borderRadius: 15,
+                    //   splashColor: Colors.red[200],
+                    // ),
                   ],
                 ),
               ],

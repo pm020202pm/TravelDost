@@ -1,12 +1,11 @@
-
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_image_compress/flutter_image_compress.dart';
 import 'package:image_picker/image_picker.dart';
-import 'package:transport/Components/Image_card.dart';
-import 'package:transport/Components/custom_textfield.dart';
+import 'package:TravelDost/Components/Image_card.dart';
+import 'package:TravelDost/Components/custom_textfield.dart';
 import 'dart:io';
 import '../Components/button.dart';
 import '../constants.dart';
@@ -27,30 +26,13 @@ class _RegisterUserState extends State<RegisterUser> {
   late String email;
   late String name;
   late String targetPath;
-  late String imageUrl = ' ';
+  bool isImageUploaded = false;
+  late String imageUrl = 'https://firebasestorage.googleapis.com/v0/b/traveldost-f6a2d.appspot.com/o/images%2Fprofile.jpg?alt=media&token=6d6b2bfd-068d-44a4-9927-4ee3963c6e1a';
   File? compressedImageFile;
 
-  ////UPLOAD IMAGE
-  Future<void> uploadImageGetUrl() async {
-    final XFile? imageFile = await ImagePicker().pickImage(source: ImageSource.gallery);
-    if (imageFile != null) {
-      File compressedImage = await compressImage(imageFile.path);
-      setState(() {
-        compressedImageFile = compressedImage;
-      });
-      print("FILENAME ${compressedImage.path}");
-    }
-
-  }
-
-  ////GET IMAGE URL
-  Future<void> getImageUrl(File compressedImage) async {
-    Reference storageReference = FirebaseStorage.instance.ref().child('images').child(DateTime.now().microsecondsSinceEpoch.toString());
-    UploadTask uploadTask = storageReference.putFile(compressedImage);
-    String uploadedImageUrl = await (await uploadTask).ref.getDownloadURL();
-    setState(() {
-      imageUrl = uploadedImageUrl;
-    });
+  @override
+  void initState() {
+    super.initState();
   }
 
   ////COMPRESS IMAGE BEFORE UPLOAD
@@ -68,6 +50,34 @@ class _RegisterUserState extends State<RegisterUser> {
     return compressedImage;
   }
 
+  ////UPLOAD IMAGE
+  Future<void> uploadImageGetUrl() async {
+    final XFile? imageFile = await ImagePicker().pickImage(source: ImageSource.gallery);
+    if (imageFile != null) {
+      File compressedImage = await compressImage(imageFile.path);
+      setState(() {
+        compressedImageFile = compressedImage;
+        isImageUploaded = true;
+      });
+      print("FILENAME ${compressedImage.path}");
+    }
+
+
+  }
+
+  ////GET IMAGE URL
+  Future<void> getImageUrl(File compressedImage) async {
+    Reference storageReference = FirebaseStorage.instance.ref().child('images').child(DateTime.now().microsecondsSinceEpoch.toString());
+    UploadTask uploadTask = storageReference.putFile(compressedImage);
+    String uploadedImage = await (await uploadTask).ref.getDownloadURL();
+    setState(() {
+      imageUrl = uploadedImage;
+      isImageUploaded = false;
+    });
+  }
+
+
+
   ////REGISTER USER
   void registerWithEmailAndPassword(String email, String password,  String firstName, String lastName) async {
     try {
@@ -75,7 +85,9 @@ class _RegisterUserState extends State<RegisterUser> {
         email: email,
         password: password,
       );
-      await getImageUrl(compressedImageFile!);
+      if(isImageUploaded==true){
+        await getImageUrl(compressedImageFile!);
+      }
       User? user = userCredential.user;
       await FirebaseFirestore.instance.collection('register').add({
         'email': email,
@@ -89,11 +101,11 @@ class _RegisterUserState extends State<RegisterUser> {
           userImageUrl=imageUrl;
           userName = '$firstName $lastName';
         });
+        mapAndSendFCM();
         print('USER UID IS : $userUid');
         print('USER IMAGE URL IS : $userImageUrl');
         print('USER NAME IS : $userName');
         Navigator.pushReplacementNamed(context, '/homepage')  ;
-        // Navigator.pushNamed(context, '/homepage');
       }
 
     } catch (e) {

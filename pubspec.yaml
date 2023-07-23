@@ -1,4 +1,4 @@
-name: transport
+name: TravelDost
 description: A new Flutter project.
 # The following line prevents the package from being accidentally published to
 # pub.dev using `flutter pub publish`. This is preferred for private packages.
@@ -41,13 +41,13 @@ dependencies:
   google_sign_in: ^6.1.4
   firebase_storage: ^11.2.5
   image_picker: ^1.0.1
-  awesome_notifications: ^0.7.4+1
   firebase_messaging: ^14.6.5
   http: ^1.1.0
   flutter_image_compress: ^2.0.3
   path_provider: ^2.0.15
-  font_awesome_flutter: ^10.5.0
   intl: ^0.17.0
+  flutter_local_notifications: ^15.1.0+1
+  line_icons: ^2.0.3
 
 dev_dependencies:
   flutter_test:
